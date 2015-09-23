@@ -17,7 +17,7 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc')
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
 process.source = cms.Source ("PoolSource",fileNames = cms.untracked.vstring("/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-25ns/Spring15BetaV5/GluGluHToGG_M-120_13TeV_powheg_pythia8/RunIISpring15-25ns-Spring15BetaV5-v0-RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150922_093229/0000/myMicroAODOutputFile_1.root"))
-##process.source = cms.Source ("PoolSource",fileNames = cms.untracked.vstring("/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-25ns/Spring15BetaV5/GluGluHToGG_M-120_13TeV_powheg_pythia8/RunIISpring15-25ns-Spring15BetaV5-v0-RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/150922_093229/0000/myMicroAODOutputFile_1.root"))
+
 #process.source = cms.Source ("PoolSource",fileNames = cms.untracked.vstring( "/store/group/phys_higgs/cmshgg/sethzenz/flashgg/HggPhys14/Phys14MicroAODV2/VBF_HToGG_M-125_13TeV-powheg-pythia6/HggPhys14-Phys14MicroAODV2-v0-Phys14DR-PU20bx25_PHYS14_25_V1-v1/150210_160130/0000/myMicroAODOutputFile_1.root"))
 
 
@@ -27,6 +27,7 @@ process.load("flashgg/Taggers/flashggTagSequence_cfi")
 
 from HLTrigger.HLTfilters.hltHighLevel_cfi import hltHighLevel
 process.hltHighLevel= hltHighLevel.clone(HLTPaths = cms.vstring("HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95_v*") )
+
 
 
 from flashgg.Taggers.flashggTagOutputCommands_cff import tagDefaultOutputCommand
@@ -40,6 +41,7 @@ process.TFileService = cms.Service("TFileService",
 
 process.flashggUntagged.Boundaries=cms.untracked.vdouble(-2)
 
+<<<<<<< HEAD
 # customization for job splitting, lumi weighting, etc.
 from flashgg.MetaData.JobConfig import customize
 customize.setDefault("maxEvents",-1)
@@ -66,6 +68,7 @@ process.tagDumper.src = "flashggUntagged"
 
 process.tagDumper.splitLumiWeight=cms.untracked.bool(True)
 #process.tagDumper.throwOnUnclassified= False
+
 process.tagDumper.dumpTrees = True
 process.tagDumper.dumpWorkspace = False
 process.tagDumper.quietRooFit = True
@@ -75,6 +78,7 @@ process.flashggDiPhotonMVA.diphotonMVAweightfile = customize.diphoxml
 cfgTools.addCategory(process.tagDumper, "Reject",  "diPhoton.mass<100 || diPhoton.mass>180",
 -1 ## if nSubcat is -1 do not store anythings
 )
+
 
 cfgTools.addCategories(process.tagDumper,
 			[## cuts are applied in cascade
@@ -100,6 +104,7 @@ cfgTools.addCategories(process.tagDumper,
                         "leadptgen := ?diPhoton.leadingPhoton().hasMatchedGenPhoton()?diPhoton.leadingPhoton().matchedGenPhoton().pt():0",
                         "subleadptgen := ?diPhoton.subLeadingPhoton().hasMatchedGenPhoton()?diPhoton.subLeadingPhoton().matchedGenPhoton().pt():0",
                         "massgen := diPhoton.genP4().mass()"
+
 			],
 			histograms=[
 			"result>>diphoMVAValue(100,-1,1)",
@@ -114,7 +119,5 @@ if customize.processType != 'data':
     process.p = cms.Path( process.tagDumper )
 else:
     process.p = cms.Path( process.hltHighLevel*process.tagDumper )
-
-
 
 customize(process)
