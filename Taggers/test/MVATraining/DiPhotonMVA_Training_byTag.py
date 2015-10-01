@@ -41,7 +41,6 @@ process.TFileService = cms.Service("TFileService",
 
 process.flashggUntagged.Boundaries=cms.untracked.vdouble(-2)
 
-<<<<<<< HEAD
 # customization for job splitting, lumi weighting, etc.
 from flashgg.MetaData.JobConfig import customize
 customize.setDefault("maxEvents",-1)
@@ -67,7 +66,6 @@ process.tagDumper = createTagDumper("UntaggedTag")
 process.tagDumper.src = "flashggUntagged"
 
 process.tagDumper.splitLumiWeight=cms.untracked.bool(True)
-#process.tagDumper.throwOnUnclassified= False
 
 process.tagDumper.dumpTrees = True
 process.tagDumper.dumpWorkspace = False
@@ -104,7 +102,6 @@ cfgTools.addCategories(process.tagDumper,
                         "leadptgen := ?diPhoton.leadingPhoton().hasMatchedGenPhoton()?diPhoton.leadingPhoton().matchedGenPhoton().pt():0",
                         "subleadptgen := ?diPhoton.subLeadingPhoton().hasMatchedGenPhoton()?diPhoton.subLeadingPhoton().matchedGenPhoton().pt():0",
                         "massgen := diPhoton.genP4().mass()"
-
 			],
 			histograms=[
 			"result>>diphoMVAValue(100,-1,1)",
