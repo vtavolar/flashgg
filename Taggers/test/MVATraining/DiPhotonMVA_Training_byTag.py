@@ -22,7 +22,7 @@ process.source = cms.Source ("PoolSource",fileNames = cms.untracked.vstring("/st
 
 
 process.load("flashgg/Taggers/flashggTagSequence_cfi")
-#process.load("flashgg/MicroAOD/flashggPreselectedDiPhotons_cfi")
+process.load("flashgg/MicroAOD/flashggPreselectedDiPhotons_cfi")
 ## process.load("flashgg/Taggers/flashggTagTester_cfi")
 
 from HLTrigger.HLTfilters.hltHighLevel_cfi import hltHighLevel
@@ -53,6 +53,14 @@ customize.options.register('diphoxml',
                            VarParsing.VarParsing.varType.string,
                            'diphoxml'
                            )
+
+#process.tagDumper.throwOnUnclassified = False
+#customize.options.register('throwOnUnclassified',
+#                           False,
+#                           VarParsing.VarParsing.multiplicity.singleton,
+#                           VarParsing.VarParsing.varType.string,
+#                           'thrOnUncl'
+#                           )
 customize.parse()
 
 
@@ -66,6 +74,8 @@ process.tagDumper = createTagDumper("UntaggedTag")
 process.tagDumper.src = "flashggUntagged"
 
 process.tagDumper.splitLumiWeight=cms.untracked.bool(True)
+
+
 
 process.tagDumper.dumpTrees = True
 process.tagDumper.dumpWorkspace = False
