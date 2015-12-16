@@ -56,7 +56,7 @@ namespace flashgg {
         virtual void analyze( const edm::Event &, const edm::EventSetup & ) override;
         virtual void endJob() override;
 
-        edm::EDGetTokenT<edm::OwnVector<flashgg::DiPhotonTagBase> > TagSorterToken_;
+        edm::EDGetTokenT<edm::View<flashgg::DiPhotonTagBase> > TagSorterToken_;
         bool expectMultiples_;
     };
 
@@ -75,7 +75,7 @@ namespace flashgg {
 // constructors and destructor
 //
     TagTestAnalyzer::TagTestAnalyzer( const edm::ParameterSet &iConfig ):
-        TagSorterToken_( consumes<edm::OwnVector<flashgg::DiPhotonTagBase> >( iConfig.getParameter<InputTag> ( "TagSorter" ) ) ),
+        TagSorterToken_( consumes<edm::View<flashgg::DiPhotonTagBase> >( iConfig.getParameter<InputTag> ( "TagSorter" ) ) ),
         expectMultiples_( iConfig.getUntrackedParameter<bool>( "ExpectMultiples", false) )
     {
     }
@@ -92,7 +92,7 @@ namespace flashgg {
         // ********************************************************************************
         // access edm objects
 
-        Handle<edm::OwnVector<flashgg::DiPhotonTagBase> > TagSorter;
+        Handle<edm::View<flashgg::DiPhotonTagBase> > TagSorter;
         iEvent.getByToken( TagSorterToken_, TagSorter );
 
         if (!expectMultiples_) {
@@ -110,7 +110,7 @@ namespace flashgg {
                 std::cout << "[UNTAGGED] category " << untagged->categoryNumber() << " mass=" << untagged->diPhoton()->mass() <<
                           ", systLabel " << untagged->systLabel() <<  std::endl;
                 if( untagged->tagTruth().isNonnull() ) {
-                    std::cout << "\t[UNTAGGED TRUTH]: genPV=" << untagged->tagTruth()->genPV() << std::endl;
+                    std::cout << "\t[UNTAGGED TRUTH]: genPV=" << untagged->diPhoton()->genPV() << std::endl;
                 }
             }
 
@@ -124,6 +124,7 @@ namespace flashgg {
                     const VBFTagTruth *truth = dynamic_cast<const VBFTagTruth *>( &*vbftag->tagTruth() );
                     assert( truth != NULL );  // If we stored a VBFTag with a nonnull pointer, we either have VBFTagTruth or a nutty bug
                     std::cout << "\t[VBF TRUTH]: genPV=" << truth->genPV() << std::endl;
+                    std::cout << "\t[VBF DIPHOTON]: genPV=" << vbftag->diPhoton()->genPV() << std::endl;
                     std::cout << "\t\t------------------------------------------" << std::endl;
                     if( truth->closestGenJetToLeadingJet().isNonnull() ) {
                         std::cout << "\t\tclosestGenJetToLeadingJet pt eta " << truth->closestGenJetToLeadingJet()->pt() << " " << truth->closestGenJetToLeadingJet()->eta() <<
