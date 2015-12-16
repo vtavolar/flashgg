@@ -139,7 +139,7 @@ namespace flashgg {
         dumpHistos_( cfg.getUntrackedParameter<bool>( "dumpHistos", false ) ),
         dumpGlobalVariables_( cfg.getUntrackedParameter<bool>( "dumpGlobalVariables", true ) ),
         classifier_( cfg.getParameter<edm::ParameterSet>( "classifierCfg" ) ),
-        throwOnUnclassified_( cfg.exists("throwOnUnclassified") ? cfg.getParameter<bool>("throwOnUnclassified") : true ),
+        throwOnUnclassified_( cfg.exists("throwOnUnclassified") ? cfg.getParameter<bool>("throwOnUnclassified") : false ),
         globalVarsDumper_( 0 )        
 
     {
@@ -163,7 +163,7 @@ namespace flashgg {
                 globalVarsDumper_->dumpLumiFactor(lumiWeight_);
                 lumiWeight_ = 1.;
             }
-            std::cout<<"In Collection dumper, processIndex is "<<processIndex_<<std::endl;
+
             globalVarsDumper_->setProcessIndex(processIndex_);
         } else if ( splitLumiWeight_ ) {
             throw cms::Exception("Configuration error") << "You specified the splitLumiWeight option but not the dumpGlobalVariables one. I can split the weight only if you also set the latter.\n";

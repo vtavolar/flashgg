@@ -178,6 +178,8 @@ class JobConfig(object):
                 putarget = map(float, self.puTarget.split(","))
                 
             processId = self.getProcessId(dsetname)
+
+            self.processIndex = self.options.processIndex
             self.processId = processId
             
             isdata = self.processType == "data"
@@ -294,7 +296,7 @@ class JobConfig(object):
             return
 
         self.options.parseArguments()
-        print "parsing arguments, processIdnex is "+str(self.options.processIndex)
+#        print "parsing arguments, processIdnex is "+str(self.options.processIndex)
         self.processIndex = self.options.processIndex
         if self.options.processIdMap != "":
             self.readProcessIdMap(self.options.processIdMap)

@@ -55,7 +55,6 @@ rediscoveryHLTcutsV1 = cms.VPSet(
             cms.PSet(max=cms.string("0.035")),
             cms.PSet(min=cms.string("0.8")),
             cms.PSet(min=cms.string("0.5"))
-
             ),
              )
     )

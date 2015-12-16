@@ -19,6 +19,7 @@ namespace flashgg {
             int processIndex;
             float npu;
             float puweight;
+            int processIndex;
         };
 
         GlobalVariablesComputer( const edm::ParameterSet &cfg );
