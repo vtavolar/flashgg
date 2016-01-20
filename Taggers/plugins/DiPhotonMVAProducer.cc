@@ -46,6 +46,8 @@ namespace flashgg {
         float CosPhi_;
         float leadmva_;
         float subleadmva_;
+
+        float  beamSpot_;
         
         float mass_;
         
@@ -138,7 +140,7 @@ namespace flashgg {
         } else {
             beamsig = -9999; // I hope this never happens! But it seems to in our default test, what's going wrong??
         }
-
+        beamSpot_ = beamsig;
         //    std::auto_ptr<DiPhotonMVAResultMap> assoc(new DiPhotonMVAResultMap);
         std::auto_ptr<vector<DiPhotonMVAResult> > results( new vector<DiPhotonMVAResult> ); // one per diphoton, always in same order, vector is more efficient than map
 
@@ -235,7 +237,7 @@ namespace flashgg {
             mvares.sigmawv = sigmawv_;
             mvares.CosPhi = CosPhi_;
             mvares.vtxprob = vtxprob_;
-
+            mvares.beamSpot = beamSpot_;
             results->push_back( mvares );
         }
         evt.put( results );
