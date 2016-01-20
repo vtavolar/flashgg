@@ -24,6 +24,7 @@ namespace flashgg {
         float sigmawv;
         float CosPhi;
         float vtxprob;
+        float beamSpot;
         float mvaValue() const {return result;}
         // Output
         float result;
