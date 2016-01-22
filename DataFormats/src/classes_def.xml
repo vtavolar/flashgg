@@ -12,8 +12,8 @@
 <class name="std::vector<flashgg::PDFWeightObject>"/>
 <class name="edm::Wrapper<std::vector<flashgg::PDFWeightObject> >"/>
 
-<class name="flashgg::DiPhotonMVAResult" ClassVersion="11">
-  <version ClassVersion="11" checksum="2040272756"/>
+<class name="flashgg::DiPhotonMVAResult" ClassVersion="13">
+  <version ClassVersion="13" checksum="1765603067"/>
 </class>
 <class name="std::vector<flashgg::DiPhotonMVAResult>"/>
 <class name="edm::Wrapper<std::vector<flashgg::DiPhotonMVAResult> >"/>

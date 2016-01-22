@@ -47,8 +47,12 @@ namespace flashgg {
         float leadmva_;
         float subleadmva_;
 
-        float  beamSpot_;
-        
+        float  beamSpotSigZ_;
+        float  beamSpotX_;
+        float  beamSpotY_;
+        float  beamSpotZ_;
+        float  beamsig_;
+
         float mass_;
         
         float nConv_;
@@ -82,7 +86,13 @@ namespace flashgg {
         CosPhi_ = 0.;
         leadmva_ = 0.;
         subleadmva_ = 0.;
-        
+
+        beamSpotSigZ_=0.;
+        beamSpotX_=0.;
+        beamSpotY_=0.;
+        beamSpotZ_=0.;
+        beamsig_=0.;
+
         mass_=0;                
 
         std::string version_old = "old";
@@ -136,11 +146,22 @@ namespace flashgg {
         evt.getByToken( beamSpotToken_, recoBeamSpotHandle );
         float beamsig;
         if( recoBeamSpotHandle.isValid() ) {
-            beamsig = recoBeamSpotHandle->sigmaZ();
+            ///FIX THIS!!!! hack to force data and MC to have the same beamsig (the MC one for now, has to be the other way around)
+            beamsig = 5.14222;
+            ///FIX THIS!!!!
+            beamSpotSigZ_ = recoBeamSpotHandle->sigmaZ();
+            beamsig_ = beamsig;
+            beamSpotX_ = recoBeamSpotHandle->x0();
+            beamSpotY_ = recoBeamSpotHandle->y0();
+            beamSpotZ_ = recoBeamSpotHandle->z0();
         } else {
             beamsig = -9999; // I hope this never happens! But it seems to in our default test, what's going wrong??
+            beamSpotSigZ_ = -9999;
+            beamsig_ = beamsig;
+            beamSpotX_ = -9999;
+            beamSpotY_ = -9999;
+            beamSpotZ_ = -9999;
         }
-        beamSpot_ = beamsig;
         //    std::auto_ptr<DiPhotonMVAResultMap> assoc(new DiPhotonMVAResultMap);
         std::auto_ptr<vector<DiPhotonMVAResult> > results( new vector<DiPhotonMVAResult> ); // one per diphoton, always in same order, vector is more efficient than map
 
@@ -237,7 +258,11 @@ namespace flashgg {
             mvares.sigmawv = sigmawv_;
             mvares.CosPhi = CosPhi_;
             mvares.vtxprob = vtxprob_;
-            mvares.beamSpot = beamSpot_;
+            mvares.beamSpotSigZ = beamSpotSigZ_;
+            mvares.beamSpotX = beamSpotX_;
+            mvares.beamSpotY = beamSpotY_;
+            mvares.beamSpotZ = beamSpotZ_;
+            mvares.beamsig = beamsig_;
             results->push_back( mvares );
         }
         evt.put( results );

@@ -28,7 +28,7 @@ process.load("flashgg/Systematics/flashggDiPhotonSystematics_cfi")
 
 
 
-from flashgg.Systematics.flashggDiPhotonSystematics_cfi import smearBins, scaleBins
+from flashgg.Systematics.flashggDiPhotonSystematics_cfi import smearBinsRereco, scaleBinsRereco
 
 process.flashggDiPhotonSmeared = cms.EDProducer('FlashggDiPhotonSystematicProducer',
                                         src = cms.InputTag("flashggDiPhotons"),
@@ -42,7 +42,7 @@ process.flashggDiPhotonSmeared = cms.EDProducer('FlashggDiPhotonSystematicProduc
                   Label = cms.string("SigmaEOverESmearing"),
                   NSigmas = cms.vint32(0,0),
                   OverallRange = cms.string("1"),
-                  BinList = smearBins,
+                  BinList = smearBinsRereco,
                   Debug = cms.untracked.bool(False)
                   ),
         cms.PSet( PhotonMethodName = cms.string("FlashggPhotonSmearConstant"),
@@ -52,7 +52,7 @@ process.flashggDiPhotonSmeared = cms.EDProducer('FlashggDiPhotonSystematicProduc
                   NSigmas = cms.vint32(-1,1),
                   #OverallRange = cms.string("r9>0.94&&abs(superCluster.eta)>=1.5"),
                   OverallRange = cms.string("1"),
-                  BinList = smearBins,
+                  BinList = smearBinsRereco,
                   # has to match the labels embedded in the photon object as
                   # defined e.g. in flashgg/MicroAOD/python/flashggRandomizedPerPhotonDiPhotonProducer_cff.py
                   #           or in flashgg/MicroAOD/python/flashggRandomizedPhotonProducer_cff.py (if at MicroAOD prod.)
@@ -76,20 +76,27 @@ process.flashggDiPhotonScale = cms.EDProducer('FlashggDiPhotonSystematicProducer
                                         # assumed for a given systematic uncertainty and is NOT required
                                         # to match 1-to-1 the number of bins above.
                                         SystMethods = cms.VPSet(
-
-                                        cms.PSet( PhotonMethodName = cms.string("FlashggPhotonScale"),
-                                                  MethodName = cms.string("FlashggDiPhotonFromPhoton"),
-                                                  Label = cms.string("DataScale"),
-                                                  NSigmas = cms.vint32(0,0),
-                                                  OverallRange = cms.string("1"),
-                                                  BinList = scaleBins,
-                                                  NoCentralShift = cms.bool(False),
-                                                  Debug = cms.untracked.bool(False)
-                                                  )
-
+            cms.PSet( PhotonMethodName = cms.string("FlashggPhotonSigEoverESmearing"),
+                      MethodName = cms.string("FlashggDiPhotonFromPhoton"),
+                      Label = cms.string("DataSigmaEOverESmearing"),
+                      NSigmas = cms.vint32(0,0),
+                      OverallRange = cms.string("1"),
+                      BinList = smearBinsRereco,
+                      Debug = cms.untracked.bool(False)
+                      ),
+            cms.PSet( PhotonMethodName = cms.string("FlashggPhotonScale"),
+                      MethodName = cms.string("FlashggDiPhotonFromPhoton"),
+                      Label = cms.string("DataScale"),
+                      NSigmas = cms.vint32(0,0),
+                      OverallRange = cms.string("1"),
+                      BinList = scaleBinsRereco,
+                      NoCentralShift = cms.bool(False),
+                      Debug = cms.untracked.bool(False)
+                      )
+            
         )
                                         )
-
+                                              
 
 
 
@@ -193,6 +200,10 @@ cfgTools.addCategories(process.tagDumper,
 			"CosPhi           := diPhotonMVA.CosPhi",
 			"vtxprob          := diPhotonMVA.vtxprob",
 			"result           := diPhotonMVA.result",
+                        "beamSpotSigZ     :=diPhotonMVA.beamSpotSigZ",
+                        "beamSpotX        :=diPhotonMVA.beamSpotX",
+                        "beamSpotY        :=diPhotonMVA.beamSpotY",
+                        "beamSpotZ        :=diPhotonMVA.beamSpotZ",
 			"mass             := diPhoton.mass",
 			"pt               := diPhoton.pt",
                         "leadSigEoE_unsm := ? diPhoton.leadingPhoton().hasUserFloat('unsmaeraedSigmaEoE')? diPhoton.leadingPhoton().userFloat('unsmaeraedSigmaEoE'):0", 
