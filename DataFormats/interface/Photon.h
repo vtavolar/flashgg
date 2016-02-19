@@ -59,6 +59,9 @@ namespace flashgg {
         void setpfChgIsoWrtChosenVtx02( float val ) {pfChgIsoWrtChosenVtx02_ = val;};
         void setpfChgIsoWrtChosenVtx03( float val ) {pfChgIsoWrtChosenVtx03_ = val;};
         void setESEffSigmaRR( float val ) {ESEffSigmaRR_ = val;};
+        void const setcorrectedR9(float val){correctedR9_ = val;};
+        void const setcorrectedEtaWidth(float val){correctedEtaWidth_ = val;};
+        void const setcorrectedS4(float val){correctedS4_ = val;};
         void setPhoIdMvaD( std::map<edm::Ptr<reco::Vertex>, float> valmap ) {  phoIdMvaD_ = valmap; };  // concept: pass the pre-computed map when calling this in the producer
         void setPhoIdMvaWrtVtx( edm::Ptr<reco::Vertex> key, float val ) { phoIdMvaD_[key] = val; } // For later updates, e.g. recomputation when vertex is already selected
         void updateEnergy( std::string key, float val );
@@ -88,6 +91,10 @@ namespace flashgg {
         float const pfPhoIso03() const {return pfPhoIso03_;};
         float const pfNeutIso04() const {return pfNeutIso04_;};
         float const pfNeutIso03() const {return pfNeutIso03_;};
+        float const correctedR9();
+        float const correctedEtaWidth();
+        float const correctedS4();
+
         std::map<edm::Ptr<reco::Vertex>, float> const pfChgIso04() const {return pfChgIso04_;};
         std::map<edm::Ptr<reco::Vertex>, float> const pfChgIso03() const {return pfChgIso03_;};
         std::map<edm::Ptr<reco::Vertex>, float> const pfChgIso02() const {return pfChgIso02_;};
@@ -194,6 +201,9 @@ namespace flashgg {
         float pfChgIsoWrtChosenVtx03_;
         float ESEffSigmaRR_;
         float sigEOverE_;
+        float correctedR9_;
+        float correctedEtaWidth_;
+        float correctedS4_;
         std::map<edm::Ptr<reco::Vertex>, float> pfChgIso04_;
         std::map<edm::Ptr<reco::Vertex>, float> pfChgIso03_;
         std::map<edm::Ptr<reco::Vertex>, float> pfChgIso02_;

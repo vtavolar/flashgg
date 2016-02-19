@@ -38,6 +38,9 @@ void Photon::ZeroVariables()
     pfChgIso02_.clear();
     phoIdMvaD_.clear();
     passElecVeto_ = false;
+    correctedR9_ = -1.;
+    correctedEtaWidth_ = -1.;
+    correctedS4_ = -1.;
 }
 
 Photon::Photon( const pat::Photon &aPhoton ) : pat::Photon::Photon( aPhoton )
@@ -81,6 +84,19 @@ Photon::Photon( const pat::Photon &aPhoton ) : pat::Photon::Photon( aPhoton )
 Photon::~Photon() {}
 
 Photon *Photon::clone() const { return new Photon( *this ); }
+
+
+float const Photon::correctedR9(){
+    return correctedR9_ < 0 ? full5x5_r9() : correctedR9_;
+}
+
+float const Photon::correctedEtaWidth(){
+    return correctedEtaWidth_ < 0 ? superCluster()->etaWidth() : correctedEtaWidth_;
+}
+
+float const Photon::correctedS4(){
+    return correctedS4_ < 0 ? s4() : correctedS4_;
+}
 
 void Photon::removeVerticesExcept( const std::set<edm::Ptr<reco::Vertex> > &vtxPtrList )
 {

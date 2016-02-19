@@ -8,6 +8,9 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "flashgg/MicroAOD/interface/PhotonIdUtils.h"
 #include "flashgg/DataFormats/interface/DiPhotonCandidate.h"
+#include "TGraph.h"
+#include "TFile.h"
+
 
 namespace flashgg {
 
@@ -23,6 +26,8 @@ namespace flashgg {
         PhotonIdUtils phoTools_;
         edm::FileInPath phoIdMVAweightfileEB_, phoIdMVAweightfileEE_;
         bool debug_;
+        bool correctShowerShapes_;
+        edm::FileInPath showerShapeTransfFile_ ;
     };
 
     DiPhotonWithUpdatedPhoIdMVAProducer::DiPhotonWithUpdatedPhoIdMVAProducer( const edm::ParameterSet &ps ) :
@@ -30,8 +35,10 @@ namespace flashgg {
         rhoToken_( consumes<double>( ps.getParameter<edm::InputTag>( "rhoFixedGridCollection" ) ) ),
         debug_( ps.getParameter<bool>( "Debug" ) )
     {
+        correctShowerShapes_ =  ps.exists("correctShowerShapes") ? ( ps.getParameter<bool>( "correctShowerShapes" )) : false  ;
         phoIdMVAweightfileEB_ = ps.getParameter<edm::FileInPath>( "photonIdMVAweightfile_EB" );
         phoIdMVAweightfileEE_ = ps.getParameter<edm::FileInPath>( "photonIdMVAweightfile_EE" );
+        showerShapeTransfFile_ = ps.getParameter<edm::FileInPath>( "showerShapeTransfFile" );
         phoTools_.setupMVA( phoIdMVAweightfileEB_.fullPath(), phoIdMVAweightfileEE_.fullPath() );
 
         produces<std::vector<flashgg::DiPhotonCandidate> >();
@@ -54,6 +61,24 @@ namespace flashgg {
             }
             flashgg::DiPhotonCandidate *new_obj = obj.clone();
             new_obj->makePhotonsPersistent();
+            if(correctShowerShapes_){
+                TFile* f_corr = TFile::Open( showerShapeTransfFile_.fullPath().c_str() );
+                TGraph* gEWEB = (TGraph*) f_corr->Get("transfEtaWidthEB");
+                TGraph* gS4EB = (TGraph*) f_corr->Get("transfS4EB");
+                TGraph* gR9full5x5EB = (TGraph*) f_corr->Get("transffull5x5R9EB");
+                if(new_obj->getLeadingPhoton().isEB()){
+                    new_obj->getLeadingPhoton().setcorrectedR9( gR9full5x5EB->Eval( new_obj->getLeadingPhoton().full5x5_r9()  )    );
+                    new_obj->getLeadingPhoton().setcorrectedS4( gS4EB->Eval( new_obj->getLeadingPhoton().s4()  )    );
+                    new_obj->getLeadingPhoton().setcorrectedEtaWidth( gEWEB->Eval( new_obj->getLeadingPhoton().superCluster()->etaWidth()  )    );
+                }
+                if(new_obj->getSubLeadingPhoton().isEB()){
+                    new_obj->getSubLeadingPhoton().setcorrectedR9( gR9full5x5EB->Eval( new_obj->getSubLeadingPhoton().full5x5_r9()  )    );
+                    new_obj->getSubLeadingPhoton().setcorrectedS4( gS4EB->Eval( new_obj->getSubLeadingPhoton().s4()  )    );
+                    new_obj->getSubLeadingPhoton().setcorrectedEtaWidth( gEWEB->Eval( new_obj->getSubLeadingPhoton().superCluster()->etaWidth()  )    );
+                }
+
+            }
+
             float newleadmva = phoTools_.computeMVAWrtVtx( new_obj->getLeadingPhoton(), new_obj->vtx(), rhoFixedGrd );
             new_obj->getLeadingPhoton().setPhoIdMvaWrtVtx( new_obj->vtx(), newleadmva);
             float newsubleadmva = phoTools_.computeMVAWrtVtx( new_obj->getSubLeadingPhoton(), new_obj->vtx(), rhoFixedGrd );
