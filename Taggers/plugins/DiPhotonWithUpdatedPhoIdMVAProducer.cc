@@ -55,6 +55,13 @@ namespace flashgg {
 
         auto_ptr<std::vector<flashgg::DiPhotonCandidate> > out_obj( new std::vector<flashgg::DiPhotonCandidate>() );
 
+
+        TFile* f_corr = TFile::Open( showerShapeTransfFile_.fullPath().c_str() );
+        TGraph* gEWEB = (TGraph*) f_corr->Get("transfEtaWidthEB");
+        TGraph* gS4EB = (TGraph*) f_corr->Get("transfS4EB");
+        TGraph* gR9full5x5EB = (TGraph*) f_corr->Get("transffull5x5R9EB");
+        float uncorrEW=0., uncorrS4=0., uncorrR9=0.;
+
         for (const auto & obj : *objects) {
             if (this->debug_) {
                 std::cout << " Input DiPhoton lead (sublead) MVA: " << obj.leadPhotonId() << " " << obj.subLeadPhotonId() << std::endl;
@@ -62,19 +69,43 @@ namespace flashgg {
             flashgg::DiPhotonCandidate *new_obj = obj.clone();
             new_obj->makePhotonsPersistent();
             if(correctShowerShapes_){
-                TFile* f_corr = TFile::Open( showerShapeTransfFile_.fullPath().c_str() );
-                TGraph* gEWEB = (TGraph*) f_corr->Get("transfEtaWidthEB");
-                TGraph* gS4EB = (TGraph*) f_corr->Get("transfS4EB");
-                TGraph* gR9full5x5EB = (TGraph*) f_corr->Get("transffull5x5R9EB");
+
                 if(new_obj->getLeadingPhoton().isEB()){
-                    new_obj->getLeadingPhoton().setcorrectedR9( gR9full5x5EB->Eval( new_obj->getLeadingPhoton().full5x5_r9()  )    );
-                    new_obj->getLeadingPhoton().setcorrectedS4( gS4EB->Eval( new_obj->getLeadingPhoton().s4()  )    );
-                    new_obj->getLeadingPhoton().setcorrectedEtaWidth( gEWEB->Eval( new_obj->getLeadingPhoton().superCluster()->etaWidth()  )    );
+                    if (this->debug_){
+                        std::cout<<"Before transformation, leading: R9  S4  EW"<<std::endl;
+                        std::cout<<new_obj->getLeadingPhoton().correctedR9()<<"  "<<new_obj->getLeadingPhoton().correctedS4()<<"  "<<new_obj->getLeadingPhoton().correctedEtaWidth()<<std::endl;
+                        std::cout<<new_obj->getLeadingPhoton().full5x5_r9()<<"  "<<new_obj->getLeadingPhoton().s4()<<"  "<<new_obj->getLeadingPhoton().superCluster()->etaWidth()<<std::endl;
+                        
+                    }
+                    uncorrEW = new_obj->getLeadingPhoton().superCluster()->etaWidth();
+                    uncorrS4 = new_obj->getLeadingPhoton().s4();
+                    uncorrR9 = new_obj->getLeadingPhoton().full5x5_r9() ;
+                    new_obj->getLeadingPhoton().setcorrectedR9( gR9full5x5EB->Eval( uncorrR9  )    );
+                    new_obj->getLeadingPhoton().setcorrectedS4( gS4EB->Eval( uncorrS4  )    );
+                    new_obj->getLeadingPhoton().setcorrectedEtaWidth( gEWEB->Eval( uncorrEW  )    );
+                    if (this->debug_){
+                        std::cout<<"After transformation, leading: R9  S4  EW"<<std::endl;
+                        std::cout<<new_obj->getLeadingPhoton().correctedR9()<<"  "<<new_obj->getLeadingPhoton().correctedS4()<<"  "<<new_obj->getLeadingPhoton().correctedEtaWidth()<<std::endl;
+                        std::cout<<new_obj->getLeadingPhoton().full5x5_r9()<<"  "<<new_obj->getLeadingPhoton().s4()<<"  "<<new_obj->getLeadingPhoton().superCluster()->etaWidth()<<std::endl;
+                    }
                 }
                 if(new_obj->getSubLeadingPhoton().isEB()){
-                    new_obj->getSubLeadingPhoton().setcorrectedR9( gR9full5x5EB->Eval( new_obj->getSubLeadingPhoton().full5x5_r9()  )    );
-                    new_obj->getSubLeadingPhoton().setcorrectedS4( gS4EB->Eval( new_obj->getSubLeadingPhoton().s4()  )    );
-                    new_obj->getSubLeadingPhoton().setcorrectedEtaWidth( gEWEB->Eval( new_obj->getSubLeadingPhoton().superCluster()->etaWidth()  )    );
+                    if (this->debug_){
+                        std::cout<<"Before transformation, subleading: R9  S4  EW"<<std::endl;
+                        std::cout<<new_obj->getSubLeadingPhoton().correctedR9()<<"  "<<new_obj->getSubLeadingPhoton().correctedS4()<<"  "<<new_obj->getSubLeadingPhoton().correctedEtaWidth()<<std::endl;
+                        std::cout<<new_obj->getSubLeadingPhoton().full5x5_r9()<<"  "<<new_obj->getSubLeadingPhoton().s4()<<"  "<<new_obj->getSubLeadingPhoton().superCluster()->etaWidth()<<std::endl;
+                    }
+                    uncorrEW = new_obj->getSubLeadingPhoton().superCluster()->etaWidth();
+                    uncorrS4 = new_obj->getSubLeadingPhoton().s4();
+                    uncorrR9 = new_obj->getSubLeadingPhoton().full5x5_r9() ;
+                    new_obj->getSubLeadingPhoton().setcorrectedR9( gR9full5x5EB->Eval( uncorrR9  )    );
+                    new_obj->getSubLeadingPhoton().setcorrectedS4( gS4EB->Eval( uncorrS4  )    );
+                    new_obj->getSubLeadingPhoton().setcorrectedEtaWidth( gEWEB->Eval( uncorrEW  )    );
+                    if (this->debug_){
+                        std::cout<<"After transformation, subleading: R9  S4  EW"<<std::endl;
+                        std::cout<<new_obj->getSubLeadingPhoton().correctedR9()<<"  "<<new_obj->getSubLeadingPhoton().correctedS4()<<"  "<<new_obj->getSubLeadingPhoton().correctedEtaWidth()<<std::endl;
+                        std::cout<<new_obj->getSubLeadingPhoton().full5x5_r9()<<"  "<<new_obj->getSubLeadingPhoton().s4()<<"  "<<new_obj->getSubLeadingPhoton().superCluster()->etaWidth()<<std::endl;
+                    }
                 }
 
             }
@@ -88,6 +119,10 @@ namespace flashgg {
             }
             out_obj->push_back(*new_obj);
         }
+        delete f_corr;
+        delete gEWEB;
+        delete gS4EB;
+        delete gR9full5x5EB;
         evt.put(out_obj);
     }
 }
