@@ -13,14 +13,18 @@ for fn in listdir("."):
                     print "  ... has length %i characters!" % len(theName)
                     shortName = theName.replace("_RunIISpring15MiniAODv2","")
                     shortName = shortName.replace("_RunIIFall15DR76","")
+                    shortName = shortName.replace("Moriond16WSFinal", "MorEW16Fin")
                     shortName = shortName.replace("_RunIIFall15MiniAODv2","")
                     shortName = shortName.replace("_pythia8","_P8")
                     shortName = shortName.replace("_asymptotic_","_asympt_")
                     shortName = shortName.replace("_mcRun2_","_mcR2_")
                     shortName = shortName.replace("Down","Do")
+                    shortName = shortName.replace("nondeterministic", "nondeterm")
+                    shortName = shortName.replace("Premix-premix", "Premix")
                     if len(shortName) >= 100:
                         shortName = shortName.replace("_TuneCUETP8M1_13TeV_Pythia8","").replace("_TuneCUETP8M1","")
                         shortName = shortName.replace("_amcatnloFXFX_madspin_","").replace("_amcFX_MS_","")
+                        shortName = shortName.replace("_amcatnloFXFX","").replace("_amcFX","")
                     print "  ... so we switch to %s (length %i)" % (shortName,len(shortName))
                     if len(shortName)>= 100:
                         raise Exception
