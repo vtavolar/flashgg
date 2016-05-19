@@ -49,14 +49,14 @@ TH2 *integrate2D( TH2 *h, bool normalize )
 DecorrTransform::DecorrTransform( TH2 *histo, float ref, bool doRef, bool doRatio, bool invert ) : doRatio_( doRatio )
 {
     doRef_ = doRef;
-    std::cout<<"doRef_ is "<<doRef_<<std::endl;
+    //    std::cout<<"doRef_ is "<<doRef_<<std::endl;
     refbin_ = histo->GetXaxis()->FindBin( ref );
     hist_ = histo;
-    hist_->Print();
+    //    hist_->Print();
     double miny = histo->GetYaxis()->GetXmin();
-    std::cout<<"miny "<<miny<<std::endl;
+    //    std::cout<<"miny "<<miny<<std::endl;
     double maxy = histo->GetYaxis()->GetXmax();
-    std::cout<<"maxy "<<maxy<<std::endl;
+    //    std::cout<<"maxy "<<maxy<<std::endl;
     for( int ii = 0; ii < histo->GetNbinsX() + 2; ++ii ) {
         TH1 *proj = histo->ProjectionY( Form( "%s_%d", histo->GetName(), ii ), ii, ii );
         //    proj->Print();
@@ -67,14 +67,14 @@ DecorrTransform::DecorrTransform( TH2 *histo, float ref, bool doRef, bool doRati
             dirtr_.push_back( cdf( proj, miny, maxy ) );
         }
         if( ii == refbin_ && ref!=0. ) {
-            std::cout<<"we DON'T use a flat inverse"<<std::endl;
+            //            std::cout<<"we DON'T use a flat inverse"<<std::endl;
             /// invtr_ = cdfInv<GraphToTF1>(proj,miny,maxy);
             if( invert ) {
                 invtr_ = cdf( proj, miny, maxy );
             } else {
                 invtr_ = cdfInv( proj, miny, maxy );
             }
-            cout << invtr_->eval( 0. ) << " " << invtr_->eval( 0.5 )  << " " << invtr_->eval( 1. ) << endl;
+            //////      cout << invtr_->eval( 0. ) << " " << invtr_->eval( 0.5 )  << " " << invtr_->eval( 1. ) << endl;
 
         }
 
@@ -89,15 +89,15 @@ double DecorrTransform::operator()( double *x, double *p )
     //    std::cout<<"doRef_ is "<<doRef_<<std::endl;
     if(doRef_){
         ret = invtr_->eval( getConverter( x[0] )->eval( x[1] ) );
-        std::cout<<" getConverter( x[0] )->eval( x[1] ) is "<< getConverter( x[0] )->eval( x[1] )<<std::endl;
-        std::cout<<"ret is "<<ret<<std::endl;
+        //        std::cout<<" getConverter( x[0] )->eval( x[1] ) is "<< getConverter( x[0] )->eval( x[1] )<<std::endl;
+        //        std::cout<<"ret is "<<ret<<std::endl;
     }
     else{
         //        std::cout<<"operator()"<<std::endl;
         //        std::cout<<"x[0]"<< x[0] <<std::endl;
         //        std::cout<<"x[1]"<< x[1] <<std::endl;
         //        std::cout<<"converter "<< getConverter( x[0] )->Print() <<std::endl;
-        std::cout<<"ret "<< getConverter( x[0] )->eval( x[1] ) <<std::endl;
+        //        std::cout<<"ret "<< getConverter( x[0] )->eval( x[1] ) <<std::endl;
         
         ret =  getConverter( x[0] )->eval( x[1] );
     }

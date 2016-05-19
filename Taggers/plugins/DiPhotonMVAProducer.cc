@@ -58,7 +58,7 @@ namespace flashgg {
         float sigmarv_decorr_;
         
         float mass_;
-        
+        DecorrTransform* transf_;
         float nConv_;
         float vtxProbMVA_;
         vector<double> vertex_prob_params_conv;
@@ -135,13 +135,16 @@ namespace flashgg {
         }
 
         if(sigmaMdecorrFile_.fullPath()!=""){
-            std::cout<<"sigmaMdecorrFile is set, so we open the file"<<std::endl;
+            //            std::cout<<"sigmaMdecorrFile is set, so we open the file"<<std::endl;
             TFile* f_decorr = new TFile((sigmaMdecorrFile_.fullPath()).c_str(), "READ");
             h_decorr_ = (TH2D*)((TH2D*)f_decorr->Get("hist_sigmaM_M"))->Clone("h_decorr_");
             //            h_decorr_ = (TH2D*)f_decorr->Get("h_decorr");
-            std::cout<<"histo found"<<std::endl;
-            h_decorr_->Print();
+            //            std::cout<<"histo found"<<std::endl;
+            //            h_decorr_->Print();
         }
+        //        DecorrTransform transf(h_decorr_ , 125., 1, 0);
+        transf_ = new DecorrTransform(h_decorr_ , 125., 1, 0);
+        std::cout<<"transformation created"<<std::endl;
         produces<vector<DiPhotonMVAResult> >(); // one per diphoton, always in same order, vector is more efficient than map
     }
 
@@ -173,8 +176,8 @@ namespace flashgg {
  //           std::cout<<"histo found"<<std::endl;
  //           h_decorr_->Print();
  //       }
-        DecorrTransform transf(h_decorr_ , 125., 1, 0);
-        std::cout<<"transformation created"<<std::endl;
+/////        DecorrTransform transf(h_decorr_ , 125., 1, 0);
+/////        std::cout<<"transformation created"<<std::endl;
         double mass_sigma[2]={0.,0.};
         double dummy[1]={0.};
 
@@ -250,14 +253,14 @@ namespace flashgg {
             sigmarv_        = .5 * sqrt( ( g1->sigEOverE() ) * ( g1->sigEOverE() ) + ( g2->sigEOverE() ) * ( g2->sigEOverE() ) );
             sigmawv_        = MassResolutionWrongVtx;
             CosPhi_         = TMath::Cos( deltaPhi( g1->phi(), g2->phi() ) );
-            std::cout<<"mass "<<diPhotons->ptrAt( candIndex )->mass()<<std::endl;
-            std::cout<<"sigmarv "<<sigmarv_<<std::endl;
+            //            std::cout<<"mass "<<diPhotons->ptrAt( candIndex )->mass()<<std::endl;
+            //            std::cout<<"sigmarv "<<sigmarv_<<std::endl;
             if(sigmaMdecorrFile_.fullPath()!=""){
-                std::cout<<"sigmaMdecorrFile is set, so we evaluate the transf"<<std::endl;
+                //                std::cout<<"sigmaMdecorrFile is set, so we evaluate the transf"<<std::endl;
                 mass_sigma[0]=diPhotons->ptrAt( candIndex )->mass();
                 mass_sigma[1]=sigmarv_;
-                sigmarv_decorr_ = transf(mass_sigma,dummy);
-                std::cout<<"transf evaluated"<<std::endl;
+                sigmarv_decorr_ = (*transf_)(mass_sigma,dummy);
+                std::cout<<"transf evaluated, sigmarv_decorr = "<<sigmarv_decorr_<<std::endl;
                 //                delete x;
                 //                delete p;
             }
