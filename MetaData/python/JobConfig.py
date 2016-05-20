@@ -306,7 +306,9 @@ class JobConfig(object):
         if self.useAAA:
             self.filePrepend = "root://xrootd-cms.infn.it/"
         elif self.useEOS:
-            self.filePrepend = "root://eoscms//eos/cms"
+            self.filePrepend = "root://eoscms.cern.ch//eos/cms"
+#            self.filePrepend = "root://xrootd.unl.edu/"
+#            self.filePrepend = "root://srmeos.cern.ch/"
             
         dataset = None
         if self.dataset != "":
