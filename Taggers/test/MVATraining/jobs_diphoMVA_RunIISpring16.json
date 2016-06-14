@@ -1,0 +1,32 @@
+{
+    "processes" : {
+        "ggH" : [
+	    ["/GluGluHToGG_M-125_13TeV_powheg_pythia8", {"args": ["processIndex=1"]}]
+        ],
+        "VBFH" : [
+	    ["/VBFHToGG_M-125_13TeV_powheg_pythia8", {"args": ["processIndex=2"]}]
+        ],
+        "VH" : [
+	    ["/VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8", {"args": ["processIndex=3"]}]
+        ],
+	"ttH" : [	
+	    ["/ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2", {"args": ["processIndex=4"]}]
+        ],
+	"diPhoBox" : [	
+	    ["/DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa", {"njobs":120, "args": ["processIndex=5"]}]
+        ],
+	"GJet" : [	
+            ["/GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8", {"njobs":250, "args": ["processIndex=6"]}],
+	   ["/GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8", {"njobs":250, "args": ["processIndex=6"]}]
+        ],
+	"QCD" : [	
+	    ["/QCD_Pt-30to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8", {"args": ["processIndex=7"]}],
+	    ["/QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8", {"args": ["processIndex=7"]}],
+	    ["/QCD_Pt-30toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8", {"args": ["processIndex=71"]}]
+        ],
+	"DoubleEG" : [
+         	[ "DoubleEG/ferrif-RunIISpring16DR80X-2_0_0-25ns-2_0_0-v0-Run2016B-PromptReco-v2-634d2b8230861d3e22d915e30c562c87/", {"njobs":100, "args": ["processIndex=-1"]} ]
+	] 
+        },
+     "cmdLine" : "campaign=RunIISpring16DR80X-2_0_0-25ns targetLumi=1e+3"
+}
