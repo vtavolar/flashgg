@@ -224,6 +224,7 @@ void PhotonIdUtils::setupMVA( const string &xmlfilenameEB, const string &xmlfile
     phoIdMva_EB_->AddVariable( "scEta",             &phoIdMva_ScEta_ );
     phoIdMva_EB_->AddVariable( "rho",                  &phoIdMva_rho_ );
     phoIdMva_EB_->BookMVA( mvamethod.c_str(), xmlfilenameEB );
+    std::cout<<"Pho ID xml EB: "<<xmlfilenameEB<<std::endl;
 
     // **** bdt 2015 EE ****
 
@@ -243,6 +244,7 @@ void PhotonIdUtils::setupMVA( const string &xmlfilenameEB, const string &xmlfile
     phoIdMva_EE_->AddVariable( "rho",                  &phoIdMva_rho_ );
     phoIdMva_EE_->AddVariable( "esEffSigmaRR",   &phoIdMva_ESEffSigmaRR_ );
     phoIdMva_EE_->BookMVA( mvamethod.c_str(), xmlfilenameEE );
+    std::cout<<"Pho ID xml EE: "<<xmlfilenameEE<<std::endl;
 }
 
 
