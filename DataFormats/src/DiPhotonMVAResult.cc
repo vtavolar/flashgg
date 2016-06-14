@@ -14,7 +14,12 @@ namespace flashgg {
         sigmawv( -9999. ),
         CosPhi( -9999. ),
         vtxprob( -9999. ),
-        result( -9999. ) {}
+        beamSpotSigZ(-9999.),
+        beamSpotX(-9999.),
+        beamSpotY(-9999.),
+        beamSpotZ(-9999.),
+        beamsig(-9999.),
+        result( -9999. ){}
 }
 // Local Variables:
 // mode:c++

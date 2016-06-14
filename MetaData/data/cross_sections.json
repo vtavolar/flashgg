@@ -1,4 +1,5 @@
 {
+	"DYToEE_NNPDF30_13TeV-powheg-pythia8"                           : { "xs" : 2008.333333 },
 	"DYJetsToLL_M-50_13TeV-madgraph-pythia8"                        : { "xs" : 4746.0                                },
 	"DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"        : { "xs" : 6025.2, "itype":20                    },
         "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8"       : { "xs" : 6025.2, "itype":20                    },
