@@ -42,6 +42,7 @@ namespace flashgg {
 
         correctInputs_ = ps.existsAs<edm::FileInPath>("correctionFile") ? true: false;
         if (correctInputs_) {
+            std::cout<<"Shower shape correction file found, corrections will be applied"<<std::endl;
             correctionFile_ = ps.getParameter<edm::FileInPath>( "correctionFile" );
             TFile* f = TFile::Open(correctionFile_.fullPath().c_str());
             corrections_.emplace_back((TGraph*)((TGraph*) f->Get("transffull5x5R9EB"))->Clone() );
