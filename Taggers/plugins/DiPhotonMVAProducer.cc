@@ -146,9 +146,21 @@ namespace flashgg {
         Handle<reco::BeamSpot> recoBeamSpotHandle;
         evt.getByToken( beamSpotToken_, recoBeamSpotHandle );
         float beamsig;
+        if(BeamSig_fromConf_ < 0){
+            if( recoBeamSpotHandle.isValid() ) {
+                ///FIX THIS!!!! hack to force data and MC to have the same beamsig (the MC one for now, has to be the other way around)
+                //                beamsig = 5.14222;
+                beamsig = recoBeamSpotHandle->sigmaZ();
+            }
+            else {
+                beamsig = -9999; // I hope this never happens! But it seems to in our default test, what's going wrong??
+            }
+        }
+        else{
+            beamsig = BeamSig_fromConf_;
+        }
+
         if( recoBeamSpotHandle.isValid() ) {
-            ///FIX THIS!!!! hack to force data and MC to have the same beamsig (the MC one for now, has to be the other way around)
-            beamsig = 5.14222;
             ///FIX THIS!!!!
             beamSpotSigZ_ = recoBeamSpotHandle->sigmaZ();
             beamsig_ = beamsig;
