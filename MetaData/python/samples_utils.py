@@ -641,6 +641,7 @@ class SamplesManager(object):
         
         """
         catalog = self.readCatalog(True)
+        print primary
         primary = primary.lstrip("/")
         if "/" in primary:
             primary,secondary,tier = primary.split("/")
