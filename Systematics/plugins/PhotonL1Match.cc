@@ -18,6 +18,7 @@ namespace flashgg {
         void eventInitialize( const edm::Event &, const edm::EventSetup & ) override;
 
     private:
+        bool doEgm_, doJets_;
         edm::EDGetTokenT<l1t::EGammaBxCollection> l1EgmObjectsTok_;
         edm::EDGetTokenT<l1t::JetBxCollection> l1JetObjectsTok_;
         std::vector<l1t::EGamma> l1EgmObjects_;
@@ -33,25 +34,35 @@ namespace flashgg {
 
     PhotonL1Match::PhotonL1Match( const edm::ParameterSet &conf, edm::ConsumesCollector && iC, const GlobalVariablesComputer *gv ) :
         BaseSystMethod<Photon,int>(conf,std::forward<edm::ConsumesCollector>(iC)),
-        l1EgmObjectsTok_(iC.consumes<l1t::EGammaBxCollection>(conf.getParameter<edm::InputTag>("l1EgmSrc"))),        
-        l1JetObjectsTok_(iC.consumes<l1t::JetBxCollection>(conf.getParameter<edm::InputTag>("l1JetSrc"))),
+        doEgm_(conf.exists("l1EgmSrc")),
+        doJets_(conf.exists("l1JetSrc")),
         deltaRmax_( conf.getParameter<double>("deltaRmax")  )
     {
         this->setMakesWeight(false);
+        if( doEgm_ ) {
+            l1EgmObjectsTok_ = iC.consumes<l1t::EGammaBxCollection>(conf.getParameter<edm::InputTag>("l1EgmSrc"));
+        }
+        if( doJets_ ) {
+            l1JetObjectsTok_ = iC.consumes<l1t::JetBxCollection>(conf.getParameter<edm::InputTag>("l1JetSrc"));
+        }
     }
 
     void PhotonL1Match::eventInitialize(const edm::Event & evt, const edm::EventSetup & es) 
     {
         edm::Handle<l1t::EGammaBxCollection> l1EgmObjects;
         edm::Handle<l1t::JetBxCollection> l1JetObjects;
-        evt.getByToken(l1EgmObjectsTok_,l1EgmObjects);
-        evt.getByToken(l1JetObjectsTok_,l1JetObjects);
-        l1EgmObjects_.clear();
-        for(auto obj : *l1EgmObjects ) { l1EgmObjects_.push_back(obj); }
-        std::sort(l1EgmObjects_.begin(), l1EgmObjects_.end(), ComparePt<l1t::EGamma>());
-        l1JetObjects_.clear();
-        for(auto obj : *l1JetObjects ) { l1JetObjects_.push_back(obj); }
-        std::sort(l1JetObjects_.begin(), l1JetObjects_.end(), ComparePt<l1t::Jet>());
+        if( doEgm_ ) {
+            evt.getByToken(l1EgmObjectsTok_,l1EgmObjects);
+            l1EgmObjects_.clear();
+            for(auto obj : *l1EgmObjects ) { l1EgmObjects_.push_back(obj); }
+            std::sort(l1EgmObjects_.begin(), l1EgmObjects_.end(), ComparePt<l1t::EGamma>());
+        }
+        if( doJets_ ) {
+            evt.getByToken(l1JetObjectsTok_,l1JetObjects);
+            l1JetObjects_.clear();
+            for(auto obj : *l1JetObjects ) { l1JetObjects_.push_back(obj); }
+            std::sort(l1JetObjects_.begin(), l1JetObjects_.end(), ComparePt<l1t::Jet>());
+        }
     }
     
     std::string PhotonL1Match::shiftLabel( int syst_value ) const
@@ -69,31 +80,35 @@ namespace flashgg {
 
     void PhotonL1Match::applyCorrection( flashgg::Photon &y, int syst_shift )
     {
-        for (auto obj : l1EgmObjects_) { 
-            
-            auto dR = reco::deltaR( obj, y.superCluster()->position() );
-            if( dR > deltaRmax_ ) { continue; }
-            
-            y.addUserInt("l1EgmMatch",1);
-            y.addUserFloat("l1EgmCandDR",dR);
-            y.addUserFloat("l1EgmCandPt",obj.et());
-            break;
+        if( doEgm_ ) {
+            for (auto obj : l1EgmObjects_) { 
+                
+                auto dR = reco::deltaR( obj, y.superCluster()->position() );
+                if( dR > deltaRmax_ ) { continue; }
+                
+                y.addUserInt("l1EgmMatch",1);
+                y.addUserFloat("l1EgmCandDR",dR);
+                y.addUserFloat("l1EgmCandPt",obj.et());
+                break;
+            }
+            if( ! y.hasUserInt("l1EgmMatch") ) {
+                y.addUserInt("l1EgmMatch",0);
+            }
         }
-        if( ! y.hasUserInt("l1EgmMatch") ) {
-            y.addUserInt("l1EgmMatch",0);
-        }
-        for (auto obj : l1JetObjects_) { 
-            
-            auto dR = reco::deltaR( obj, y );
-            if( dR > deltaRmax_ ) { continue; }
-            
-            y.addUserInt("l1JetMatch",1);
-            y.addUserFloat("l1JetCandDR",dR);
-            y.addUserFloat("l1JetCandPt",obj.et());
-            break;
-        }
-        if( ! y.hasUserInt("l1JetMatch") ) {
-            y.addUserInt("l1JetMatch",0);
+        if( doJets_ ) {
+            for (auto obj : l1JetObjects_) { 
+                
+                auto dR = reco::deltaR( obj, y );
+                if( dR > deltaRmax_ ) { continue; }
+                
+                y.addUserInt("l1JetMatch",1);
+                y.addUserFloat("l1JetCandDR",dR);
+                y.addUserFloat("l1JetCandPt",obj.et());
+                break;
+            }
+            if( ! y.hasUserInt("l1JetMatch") ) {
+                y.addUserInt("l1JetMatch",0);
+            }
         }
     }
 }
