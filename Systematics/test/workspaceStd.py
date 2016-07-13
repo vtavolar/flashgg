@@ -2,6 +2,7 @@
 
 import FWCore.ParameterSet.Config as cms
 import FWCore.Utilities.FileUtils as FileUtils
+import FWCore.ParameterSet.VarParsing as VarParsing
 from flashgg.Systematics.SystematicDumperDefaultVariables import minimalVariables,minimalHistograms,minimalNonSignalVariables,systematicVariables
 import os
 
@@ -40,6 +41,27 @@ phosystlabels = []
 jetsystlabels = []
 elesystlabels = []
 musystlabels = []
+
+from flashgg.MetaData.JobConfig import customize
+customize.options.register('doFiducial',
+                           'true',
+                           VarParsing.VarParsing.multiplicity.singleton,
+                           VarParsing.VarParsing.varType.bool,
+                           'doFiducial'
+                           )
+
+process.load("flashgg/Taggers/flashggTagSequence_cfi")
+print process.flashggTagSequence
+if customize.doFiducial:
+    from PhysicsTools.PatAlgos.tools.helpers import cloneProcessingSnippet,massSearchReplaceAnyInputTag
+    process.flashggTagSequence.remove(process.flashggVBFTag)
+    process.flashggTagSequence.remove(process.flashggTTHLeptonicTag)
+    process.flashggTagSequence.remove(process.flashggTTHHadronicTag)
+    process.flashggTagSequence.replace(process.flashggUntagged, process.flashggSigmaMoMpToMTag)
+
+
+print process.flashggTagSequence
+
 
 # import flashgg customization to check if we have signal or background
 from flashgg.MetaData.JobConfig import customize
