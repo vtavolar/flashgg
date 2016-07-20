@@ -58,9 +58,15 @@ customize.options.register('acceptance',
                            )
 
 
+print "Printing defaults"
+print 'doFiducial '+str(customize.doFiducial)
+print 'acceptance '+str(customize.acceptance)
 # import flashgg customization to check if we have signal or background
 from flashgg.MetaData.JobConfig import customize
 customize.parse()
+print "Printing options"
+print 'doFiducial '+str(customize.doFiducial)
+print 'acceptance '+str(customize.acceptance)
 
 if customize.doFiducial == 'True':
     matchCut = "leadingPhoton.hasMatchedGenPhoton() && subLeadingPhoton.hasMatchedGenPhoton()"
@@ -70,10 +76,10 @@ if customize.doFiducial == 'True':
     print process.flashggPreselectedDiPhotons.cut
 
     if customize.acceptance == 'IN':
-        process.flashggPreselectedDiPhotons.cut = cms.string(str(process.flashggPreselectedDiPhotons.cut)[12:-2] +' && '+ str(matchCut)+ ' && ' + str(accCut))
+        process.flashggPreselectedDiPhotons.cut = cms.string(str(process.flashggPreselectedDiPhotons.cut)[12:-2] +' && '+ str(matchCut)+ ' && ' + str(accCut) + ' && '+str(phoIDcut))
 
     if customize.acceptance == 'OUT':
-        process.flashggPreselectedDiPhotons.cut = cms.string(str(process.flashggPreselectedDiPhotons.cut)[12:-2] +' && '+ str(matchCut)+ ' && !' + str(accCut))
+        process.flashggPreselectedDiPhotons.cut = cms.string(str(process.flashggPreselectedDiPhotons.cut)[12:-2] +' && '+ str(matchCut)+ ' && !' + str(accCut) + ' && '+str(phoIDcut))
         
     if customize.acceptance == 'NONE':
         process.flashggPreselectedDiPhotons.cut = cms.string(str(process.flashggPreselectedDiPhotons.cut)[12:-2] +' && '+ str(phoIDcut))
@@ -112,6 +118,18 @@ useEGMTools(process)
 if customize.processId.count("h_") or customize.processId.count("vbf_") or customize.processId.count("Acceptance"): # convention: ggh vbf wzh (wh zh) tth
     print "Signal MC, so adding systematics and dZ"
     variablesToUse = minimalVariables
+    variablesToUse.append("leadgeniso := ? diPhoton().leadingPhoton().hasMatchedGenPhoton() ? diPhoton().leadingPhoton().userFloat(\"genIso\") : -99.")
+    variablesToUse.append("subleadgeniso := ? diPhoton().subLeadingPhoton().hasMatchedGenPhoton() ? diPhoton().subLeadingPhoton().userFloat(\"genIso\") : -99.")
+    variablesToUse.append("leadGenEta := ? diPhoton().leadingPhoton().hasMatchedGenPhoton() ? diPhoton().leadingPhoton().matchedGenPhoton().eta() : -99.")
+    variablesToUse.append("subleadGenEta := ? diPhoton().subLeadingPhoton().hasMatchedGenPhoton() ? diPhoton().subLeadingPhoton().matchedGenPhoton().eta() : -99.")
+
+    variablesToUse.append("leadGenPt := ? diPhoton().leadingPhoton().hasMatchedGenPhoton() ? diPhoton().leadingPhoton().matchedGenPhoton().pt() : -99.")
+    variablesToUse.append("subleadGenPt := ? diPhoton().subLeadingPhoton().hasMatchedGenPhoton() ? diPhoton().subLeadingPhoton().matchedGenPhoton().pt() : -99.")
+    variablesToUse.append("genmass := diPhoton().genP4().mass()")
+    variablesToUse.append("decorrSigmarv := diPhotonMVA().decorrSigmarv")
+    variablesToUse.append("leadmva := diPhotonMVA().leadmva")
+    variablesToUse.append("subleadmva := diPhotonMVA().subleadmva")
+
     for direction in ["Up","Down"]:
         phosystlabels.append("MvaShift%s01sigma" % direction)
 #        phosystlabels.append("MvaLinearSyst%s01sigma" % direction)
@@ -194,8 +212,8 @@ process.tagsDumper.className = "DiPhotonTagDumper"
 process.tagsDumper.src = "flashggSystTagMerger"
 #process.tagsDumper.src = "flashggTagSystematics"
 process.tagsDumper.processId = "test"
-process.tagsDumper.dumpTrees = False
-process.tagsDumper.dumpWorkspace = True
+process.tagsDumper.dumpTrees = True
+process.tagsDumper.dumpWorkspace = False
 process.tagsDumper.dumpHistos = False
 process.tagsDumper.quietRooFit = True
 process.tagsDumper.nameTemplate = cms.untracked.string("$PROCESS_$SQRTS_$CLASSNAME_$SUBCAT_$LABEL")
