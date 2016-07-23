@@ -7,30 +7,30 @@ bTagEffBins = cms.PSet(
     variables = cms.vstring("hadronFlavour","abs(eta)","pt"),
     bins = cms.VPSet(
                      #udsg jets
-                     cms.PSet(lowBounds = cms.vdouble(-0.5,0.0,0.0), upBounds = cms.vdouble(3.5,2.4,50.0), values = cms.vdouble(0.04360846), uncertainties = cms.vdouble(0.0)),
-                     cms.PSet(lowBounds = cms.vdouble(-0.5,0.0,50.0), upBounds = cms.vdouble(3.5,2.4,100.0), values = cms.vdouble(0.02723417), uncertainties = cms.vdouble(0.0)),
-                     cms.PSet(lowBounds = cms.vdouble(-0.5,0.0,100.0), upBounds = cms.vdouble(3.5,2.4,200.0), values = cms.vdouble(0.02553537), uncertainties = cms.vdouble(0.0)),
-                     cms.PSet(lowBounds = cms.vdouble(-0.5,0.0,200.0), upBounds = cms.vdouble(3.5,2.4,999999.0), values = cms.vdouble(0.03050519), uncertainties = cms.vdouble(0.0)),
+                     cms.PSet(lowBounds = cms.vdouble(-0.5,0.0,0.0), upBounds = cms.vdouble(3.5,2.4,50.0), values = cms.vdouble(0.01812901), uncertainties = cms.vdouble(0.0)),
+                     cms.PSet(lowBounds = cms.vdouble(-0.5,0.0,50.0), upBounds = cms.vdouble(3.5,2.4,100.0), values = cms.vdouble(0.01454259), uncertainties = cms.vdouble(0.0)),
+                     cms.PSet(lowBounds = cms.vdouble(-0.5,0.0,100.0), upBounds = cms.vdouble(3.5,2.4,200.0), values = cms.vdouble(0.01671879), uncertainties = cms.vdouble(0.0)),
+                     cms.PSet(lowBounds = cms.vdouble(-0.5,0.0,200.0), upBounds = cms.vdouble(3.5,2.4,999999.0), values = cms.vdouble(0.0192372), uncertainties = cms.vdouble(0.0)),
                      #
                      cms.PSet(lowBounds = cms.vdouble(-0.5,2.4,0.0), upBounds = cms.vdouble(3.5,10.0,50.0), values = cms.vdouble(0.0), uncertainties = cms.vdouble(0.0)),
                      cms.PSet(lowBounds = cms.vdouble(-0.5,2.4,50.0), upBounds = cms.vdouble(3.5,10.0,100.0), values = cms.vdouble(0.0), uncertainties = cms.vdouble(0.0)),
                      cms.PSet(lowBounds = cms.vdouble(-0.5,2.4,100.0), upBounds = cms.vdouble(3.5,10.0,200.0), values = cms.vdouble(0.0), uncertainties = cms.vdouble(0.0)),
                      cms.PSet(lowBounds = cms.vdouble(-0.5,2.4,200.0), upBounds = cms.vdouble(3.5,10.0,999999.0), values = cms.vdouble(0.0), uncertainties = cms.vdouble(0.0)),
                      #c jets
-                     cms.PSet(lowBounds = cms.vdouble(3.5,0.0,0.0), upBounds = cms.vdouble(4.5,2.4,50.0), values = cms.vdouble(0.1269147), uncertainties = cms.vdouble(0.0)),
-                     cms.PSet(lowBounds = cms.vdouble(3.5,0.0,50.0), upBounds = cms.vdouble(4.5,2.4,100.0), values = cms.vdouble(0.1301700), uncertainties = cms.vdouble(0.0)),
-                     cms.PSet(lowBounds = cms.vdouble(3.5,0.0,100.0), upBounds = cms.vdouble(4.5,2.4,200.0), values = cms.vdouble(0.1364042), uncertainties = cms.vdouble(0.0)),
-                     cms.PSet(lowBounds = cms.vdouble(3.5,0.0,200.0), upBounds = cms.vdouble(4.5,2.4,999999.0), values = cms.vdouble(0.1647941), uncertainties = cms.vdouble(0.0)),
+                     cms.PSet(lowBounds = cms.vdouble(3.5,0.0,0.0), upBounds = cms.vdouble(4.5,2.4,50.0), values = cms.vdouble(0.1738908), uncertainties = cms.vdouble(0.0)),
+                     cms.PSet(lowBounds = cms.vdouble(3.5,0.0,50.0), upBounds = cms.vdouble(4.5,2.4,100.0), values = cms.vdouble(0.1855356), uncertainties = cms.vdouble(0.0)),
+                     cms.PSet(lowBounds = cms.vdouble(3.5,0.0,100.0), upBounds = cms.vdouble(4.5,2.4,200.0), values = cms.vdouble(0.1714802), uncertainties = cms.vdouble(0.0)),
+                     cms.PSet(lowBounds = cms.vdouble(3.5,0.0,200.0), upBounds = cms.vdouble(4.5,2.4,999999.0), values = cms.vdouble(0.162211), uncertainties = cms.vdouble(0.0)),
                      #
                      cms.PSet(lowBounds = cms.vdouble(3.5,2.4,0.0), upBounds = cms.vdouble(4.5,10.0,50.0), values = cms.vdouble(0.0), uncertainties = cms.vdouble(0.0)),
                      cms.PSet(lowBounds = cms.vdouble(3.5,2.4,50.0), upBounds = cms.vdouble(4.5,10.0,100.0), values = cms.vdouble(0.0), uncertainties = cms.vdouble(0.0)),
                      cms.PSet(lowBounds = cms.vdouble(3.5,2.4,100.0), upBounds = cms.vdouble(4.5,10.0,200.0), values = cms.vdouble(0.0), uncertainties = cms.vdouble(0.0)),
                      cms.PSet(lowBounds = cms.vdouble(3.5,2.4,200.0), upBounds = cms.vdouble(4.5,10.0,999999.0), values = cms.vdouble(0.0), uncertainties = cms.vdouble(0.0)),
                      #b jets
-                     cms.PSet(lowBounds = cms.vdouble(4.5,0.0,0.0), upBounds = cms.vdouble(5.5,2.4,50.0), values = cms.vdouble(0.5500933), uncertainties = cms.vdouble(0.0)),
-                     cms.PSet(lowBounds = cms.vdouble(4.5,0.0,50.0), upBounds = cms.vdouble(5.5,2.4,100.0), values = cms.vdouble(0.6088235), uncertainties = cms.vdouble(0.0)),
-                     cms.PSet(lowBounds = cms.vdouble(4.5,0.0,100.0), upBounds = cms.vdouble(5.5,2.4,200.0), values = cms.vdouble(0.6348762), uncertainties = cms.vdouble(0.0)),
-                     cms.PSet(lowBounds = cms.vdouble(4.5,0.0,200.0), upBounds = cms.vdouble(5.5,2.4,999999.0), values = cms.vdouble(0.5543137), uncertainties = cms.vdouble(0.0)),
+                     cms.PSet(lowBounds = cms.vdouble(4.5,0.0,0.0), upBounds = cms.vdouble(5.5,2.4,50.0), values = cms.vdouble(0.6482595), uncertainties = cms.vdouble(0.0)),
+                     cms.PSet(lowBounds = cms.vdouble(4.5,0.0,50.0), upBounds = cms.vdouble(5.5,2.4,100.0), values = cms.vdouble(0.6953824), uncertainties = cms.vdouble(0.0)),
+                     cms.PSet(lowBounds = cms.vdouble(4.5,0.0,100.0), upBounds = cms.vdouble(5.5,2.4,200.0), values = cms.vdouble(0.6815274), uncertainties = cms.vdouble(0.0)),
+                     cms.PSet(lowBounds = cms.vdouble(4.5,0.0,200.0), upBounds = cms.vdouble(5.5,2.4,999999.0), values = cms.vdouble(0.6496513), uncertainties = cms.vdouble(0.0)),
                      #
                      cms.PSet(lowBounds = cms.vdouble(4.5,2.4,0.0), upBounds = cms.vdouble(5.5,10.0,50.0), values = cms.vdouble(1.0), uncertainties = cms.vdouble(0.0)),
                      cms.PSet(lowBounds = cms.vdouble(4.5,2.4,50.0), upBounds = cms.vdouble(5.5,10.0,100.0), values = cms.vdouble(1.0), uncertainties = cms.vdouble(0.0)),
@@ -55,6 +55,25 @@ RMSShiftBins = cms.PSet(
                      cms.PSet( lowBounds = cms.vdouble(2.75,50.), upBounds = cms.vdouble(3.0,99999999.), values = cms.vdouble(0.0), uncertainties = cms.vdouble( 0.003 )),
                      cms.PSet( lowBounds = cms.vdouble(3.0,50.), upBounds = cms.vdouble(4.7,99999999.), values = cms.vdouble(0.0), uncertainties = cms.vdouble( 0.003 )),
                      )
+    )
+
+
+UnmatchedPUBins = cms.PSet(
+    variables = cms.vstring("abs(eta)","pt"),
+    bins = cms.VPSet(
+                   cms.PSet( lowBounds = cms.vdouble(2.50,20.), upBounds = cms.vdouble(2.75,25.), values = cms.vdouble(1.039), uncertainties = cms.vdouble( -0.039 )),
+                   cms.PSet( lowBounds = cms.vdouble(2.75,20.), upBounds = cms.vdouble(3.00,25.), values = cms.vdouble(1.008), uncertainties = cms.vdouble( -0.008 )),
+                   cms.PSet( lowBounds = cms.vdouble(3.00,20.), upBounds = cms.vdouble(4.00,25.), values = cms.vdouble(0.954), uncertainties = cms.vdouble( 0.046 )),
+                   cms.PSet( lowBounds = cms.vdouble(4.00,20.), upBounds = cms.vdouble(4.70,25.), values = cms.vdouble(0.894), uncertainties = cms.vdouble( 0.106 )),
+                   cms.PSet( lowBounds = cms.vdouble(2.50,25.), upBounds = cms.vdouble(2.75,30.), values = cms.vdouble(0.974), uncertainties = cms.vdouble( 0.026 )),
+                   cms.PSet( lowBounds = cms.vdouble(2.75,25.), upBounds = cms.vdouble(3.00,30.), values = cms.vdouble(0.891), uncertainties = cms.vdouble( 0.109 )),
+                   cms.PSet( lowBounds = cms.vdouble(3.00,25.), upBounds = cms.vdouble(4.00,30.), values = cms.vdouble(0.941), uncertainties = cms.vdouble( 0.059 )),
+                   cms.PSet( lowBounds = cms.vdouble(4.00,25.), upBounds = cms.vdouble(4.70,30.), values = cms.vdouble(0.924), uncertainties = cms.vdouble( 0.076 )),
+                   cms.PSet( lowBounds = cms.vdouble(2.50,30.), upBounds = cms.vdouble(2.75,50.), values = cms.vdouble(1.068), uncertainties = cms.vdouble( -0.068 )),
+                   cms.PSet( lowBounds = cms.vdouble(2.75,30.), upBounds = cms.vdouble(3.00,50.), values = cms.vdouble(0.680), uncertainties = cms.vdouble( 0.320 )),
+                   cms.PSet( lowBounds = cms.vdouble(3.00,30.), upBounds = cms.vdouble(4.00,50.), values = cms.vdouble(0.893), uncertainties = cms.vdouble( 0.107 )),
+                   cms.PSet( lowBounds = cms.vdouble(4.00,30.), upBounds = cms.vdouble(4.70,50.), values = cms.vdouble(0.877), uncertainties = cms.vdouble( 0.123 ))
+                   )
     )
 
 def createJetSystematicsForTag(process,jetInputTag):
@@ -102,9 +121,16 @@ def createJetSystematicsForTag(process,jetInputTag):
                                                            BinList  = RMSShiftBins,
                                                            ApplyCentralValue = cms.bool(False),
                                                            Debug = cms.untracked.bool(False)
+                                                           ),
+                                                 cms.PSet( MethodName = cms.string("FlashggJetWeight"),
+                                                           Label = cms.string("UnmatchedPUWeight"),
+                                                           NSigmas = cms.vint32(-1,1),
+                                                           OverallRange = cms.string("abs(eta)>2.5&&abs(eta)<4.7&&pt>20.&&pt<50.&&hasGenMatch==0"),
+                                                           BinList = UnmatchedPUBins,
+                                                           ApplyCentralValue = cms.bool(False),
+                                                           Debug = cms.untracked.bool(False),
                                                            )
                                                  )
-                         
                          )
           )
 #  setattr(process.RandomNumberGeneratorService,newName,cms.PSet(initialSeed = cms.untracked.uint32(int(num)))) 
