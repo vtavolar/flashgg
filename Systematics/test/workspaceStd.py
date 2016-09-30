@@ -146,7 +146,9 @@ useEGMTools(process)
 if customize.processId.count("h_") or customize.processId.count("vbf_") or customize.processId.count("Acceptance"): # convention: ggh vbf wzh (wh zh) tth
     print "Signal MC, so adding systematics and dZ"
     variablesToUse = minimalVariables
-    ## variablesToUse.extend(fc.getGenVariables())
+#    variablesToUse.extend(fc.getGenVariables(True))
+#    variablesToUse.extend(fc.getRecoVariables(True))
+    variablesToUse.append("genLeadGenIso := ? diPhoton().leadingPhoton().hasMatchedGenPhoton() ? diPhoton().leadingPhoton().userFloat(\"genIso\") : -99")
     variablesToUse.append("decorrSigmarv := diPhotonMVA().decorrSigmarv")
     variablesToUse.append("leadmva := diPhotonMVA().leadmva")
     variablesToUse.append("subleadmva := diPhotonMVA().subleadmva")
@@ -199,6 +201,9 @@ print "--- Variables to be dumped, including systematic weights ---"
 print variablesToUse
 print "------------------------------------------------------------"
 
+#from flashgg.Taggers.globalVariables_cff import globalVariables
+#globalVariables.extraFloats.rho = cms.InputTag("rhoFixedGridAll")
+
 cloneTagSequenceForEachSystematic(process,systlabels,phosystlabels,jetsystlabels,jetSystematicsInputTags)
 
 ###### Dumper section
@@ -232,6 +237,7 @@ process.extraDumpers = cms.Sequence()
 process.load("flashgg.Taggers.diphotonTagDumper_cfi") ##  import diphotonTagDumper 
 import flashgg.Taggers.dumperConfigTools as cfgTools
 
+
 process.tagsDumper.className = "DiPhotonTagDumper"
 process.tagsDumper.src = "flashggSystTagMerger"
 #process.tagsDumper.src = "flashggTagSystematics"
@@ -241,6 +247,9 @@ process.tagsDumper.dumpWorkspace = customize.dumpWorkspace
 process.tagsDumper.dumpHistos = False
 process.tagsDumper.quietRooFit = True
 process.tagsDumper.nameTemplate = cms.untracked.string("$PROCESS_$SQRTS_$CLASSNAME_$SUBCAT_$LABEL")
+
+#if(customize.doFiducial):
+#    fc.addObservables(process, process.tagsDumper, customize.processType )
 
 #tagList=[
 #["UntaggedTag",4],
@@ -379,7 +388,7 @@ if customize.doFiducial:
           nPdfWeights = -1
           nAlphaSWeights = -1
           nScaleWeights = -1
-    fc.addGenOnlyAnalysis(process,customize.acceptance,tagList,systlabels,pdfWeights=(dumpPdfWeights,nPdfWeights,nAlphaSWeights,nScaleWeights))
+#    fc.addGenOnlyAnalysis(process,customize.acceptance,tagList,systlabels,pdfWeights=(dumpPdfWeights,nPdfWeights,nAlphaSWeights,nScaleWeights))
 
 print "--- Dumping modules that take diphotons as input: ---"
 mns = process.p.moduleNames()
