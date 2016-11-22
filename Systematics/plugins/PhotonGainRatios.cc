@@ -115,15 +115,20 @@ namespace flashgg {
             if( rrh == ecalRecalibHitEB_->end() ) { continue; }
             float chi2 = crh->chi2();
             bool g6 = crh->checkFlag( EcalRecHit::kHasSwitchToGain6 );
-            bool g1 = crh->checkFlag( EcalRecHit::kHasSwitchToGain1 );
+            bool g1 = crh->checkFlag( EcalRecHit::kHasSwitchToGain1 );           
             energySum += crh->energy() * hnf.second;
             recalibEnergySum += rrh->energy() * hnf.second;
-            recalibCorrEnergySum += rrh->energy() * hnf.second * MultiFitParametricCorrection(rrh->energy(),chi2,g6,g1);
+            float gcorr = MultiFitParametricCorrection(rrh->energy(),chi2,g6,g1);
+            recalibCorrEnergySum += rrh->energy() * hnf.second / gcorr;
+            /// if( g6 || g1 ) { 
+            ///     std::cout << "PhotonGainRatios::applyCorrection " << g6 << " " << g1 << " " << gcorr << " " << energySum << " " << recalibEnergySum << " " << recalibCorrEnergySum << std::endl;
+            /// }
         }
         
-        // corr = rawEnergy - energySum + energySum * recalibCorrEnergySum / recalibEnergySum
+        // corrRawEnergy = rawEnergy - energySum + energySum * recalibCorrEnergySum / recalibEnergySum
         float corr = 1. + energySum * ( recalibEnergySum != 0 ? recalibCorrEnergySum / recalibEnergySum - 1. : 0. ) / y.superCluster()->rawEnergy();
         
+        // std::cout << "PhotonGainRatios::applyCorrection " << energySum << " " << recalibEnergySum << " " << recalibCorrEnergySum << std::endl;
         if( updateEnergy_ ) {
             y.updateEnergy( shiftLabel( syst_shift ), corr * y.energy() );
         } else {
