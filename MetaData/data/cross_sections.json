@@ -111,6 +111,10 @@
         "VBFHToGG_M-129_13TeV_powheg_pythia8"                          : { "xs" : 3.6650,   "br" : 0.002251, "itype":-129100 },
         "VBFHToGG_M130_13TeV_amcatnlo_pythia8"                          : { "xs" : 3.6370,   "br" : 0.002238, "itype":-130100 },
         "VBFHToGG_M-130_13TeV_powheg_pythia8"                          : { "xs" : 3.6370,   "br" : 0.002238, "itype":-130100 },
+
+	"ttHToGG_M125_13TeV_powheg_pythia8_v2"                          : { "xs" : 0.5071,   "br" : 0.00227, "itype":-125300 },
+	"ttHJetToGG_M110_13TeV_amcatnloFXFX_madspin_pythia8"            : { "xs" : 0.5071,   "br" : 0.00227, "itype":-125300 },
+
 	"GJet_Pt-20toInf_DoubleEMEnriched_MGG-40to80_TuneCUETP8M1_13TeV_Pythia8" : { "xs" : 3216.0, "br" : 1.0, "kf" : 1.0, "itype":3 },
 	"GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8" : { "xs" : 220.0, "br" : 1.0, "kf" : 1.0, "itype":1 },
 	"GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8" :  { "xs" : 850.8,  "br" : 1.0,   "kf" : 1.0, "itype":2 },
