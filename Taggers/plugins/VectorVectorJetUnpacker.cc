@@ -34,8 +34,8 @@ namespace flashgg {
         jetsToken_( consumes<View<vector<flashgg::Jet> > >( iConfig.getParameter<InputTag>( "JetsTag" ) ) ),
         nCollections_( iConfig.getParameter<unsigned int>( "NCollections" ) )
     {
-        if( nCollections_ > 9 ) {
-            throw cms::Exception( "Configuration" ) << " Number of jet collections more than 1 digit long is unreasonable";
+        if( nCollections_ > 99 ) {
+            throw cms::Exception( "Configuration" ) << " Number of jet collections more than 2 digit long is unreasonable";
             // We never needed more than 3 in tests; 5 should be safe. 10 would be bonkers
         }
         for( unsigned int i = 0 ; i < nCollections_ ; i++ ) {
