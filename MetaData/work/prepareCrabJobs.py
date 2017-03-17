@@ -239,8 +239,8 @@ if options.createCrabConfig:
     Popen(['cp', '-p', options.parameterSet, './'])
     rel = os.environ.get('CMSSW_BASE')
     print rel
-    Popen(['cp', '-p', rel+'/src/flashgg/MicroAOD/data/Spring16_25nsV6_DATA.db', './'])
-    Popen(['cp', '-p', rel+'/src/flashgg/MicroAOD/data/Spring16_25nsV6_MC.db', './'])
+    Popen(['cp', '-p', rel+'/src/flashgg/Systematics/data/JEC/Summer16_23Sep2016V4_MC.db', './'])
+    Popen(['cp', '-p', rel+'/src/flashgg/Systematics/data/JEC/Summer16_23Sep2016AllV4_DATA.db', './'])
     Popen(['cp', '-p', rel+'/src/flashgg/MicroAOD/data/QGL_80X.db', './'])
     print ("Storing options into config.json")
     cfg = open("config.json","w+")
@@ -260,6 +260,10 @@ if options.createCrabConfig:
         ###         PrimaryDataset = PrimaryDataset +"-"+ ProcessedDataset[position:]
             
         jobname = "_".join([flashggVersion, PrimaryDataset, ProcessedDataset])
+        orig_jobname = jobname
+        while os.path.isdir("crab_" + jobname):
+            itry += 1
+            jobname = "_".join([flashggVersion, PrimaryDataset, ProcessedDataset, str(itry).zfill(2)])
         if len(jobname) > 97:
             jobname = jobname.replace("TuneCUEP8M1_13TeV-pythia8","13TeV")
         if len(jobname) > 97:
@@ -307,8 +311,18 @@ if options.createCrabConfig:
         ###     print "-->", len(jobname), jobname
         ###     raise Exception
         if len(jobname) > 97:
-            print "jobname length: %d " % len(jobname)
-            jobname = jobname[:97]
+            jobname = jobname.replace("_withHLT_80X_mcRun2_asymptotic_v14_ext1-v1","reHLTasym16")
+        if len(jobname) > 97:
+            jobname = jobname.replace("RunIISummer16MiniAODv2-PUMoriond17","Summer16")
+        if len(jobname) > 97:
+            jobname = jobname.replace("TrancheIV","T4")
+        if len(jobname) > 97:
+            print orig_jobname
+            print "-->", len(jobname), jobname
+            raise Exception,"jobname remains too long, additional hacks needed in prepareCrabJobs.py"
+        #if len(jobname) > 97:
+        #    print "jobname length: %d " % len(jobname)
+        #    jobname = jobname[:97]
         jobname0 = jobname.rstrip("-").rstrip("-v")
         
         # Increment flashgg- processing index if job has been launched before (ie if crab dir already exists)

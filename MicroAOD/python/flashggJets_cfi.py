@@ -10,7 +10,7 @@ from CondCore.DBCommon.CondDBSetup_cfi import *
 import os
 
 flashggBTag = 'pfCombinedInclusiveSecondaryVertexV2BJetTags'
-maxJetCollections = 8
+maxJetCollections = 10
 #qgDatabaseVersion = 'v1' # check https://twiki.cern.ch/twiki/bin/viewauth/CMS/QGDataBaseVersion
 qgDatabaseVersion = '80X'
 
@@ -88,8 +88,12 @@ def addFlashggPFCHSJets(process,
     genJetCollection = cms.InputTag('slimmedGenJets'),
     genParticles     = cms.InputTag('prunedGenParticles'),
     # jet param
-    algo = 'AK', rParam = 0.4
+    algo = 'AK', rParam = 0.4,
+    btagInfos =  ['pfImpactParameterTagInfos','pfSecondaryVertexTagInfos'] #Extra btagging info
   )
+
+  #Recalculate btagging info
+  getattr( process, 'patJetsAK4PFCHSLeg' + label).addTagInfos = True
   
   #adjust PV used for Jet Corrections
   #process.patJetCorrFactorsAK4PFCHSLeg.primaryVertices = "offlineSlimmedPrimaryVertices"
@@ -124,6 +128,7 @@ def addFlashggPFCHSJets(process,
                                VertexCandidateMapTag = cms.InputTag("flashggVertexMapForCHS"),
                                qgVariablesInputTag   = cms.InputTag('QGTaggerPFCHS'+label, 'qgLikelihood'),
                                ComputeSimpleRMS = cms.bool(True),
+                               ComputeRegVars = cms.bool(True),
                                PileupJetIdParameters = full_80x_chs,
                                rho     = cms.InputTag("fixedGridRhoFastjetAll"),
                                JetCollectionIndex = cms.uint32(vertexIndex),
@@ -209,7 +214,8 @@ def addFlashggPuppiJets(process,
                           JetTag                = cms.InputTag('patJetsAK4PUPPI' + label),
                           VertexCandidateMapTag = cms.InputTag("flashggVertexMapForPUPPI"),
                           UsePuppi              = cms.untracked.bool(True),
-                          ComputeSimpleRMS = cms.bool(True)
+                          ComputeSimpleRMS = cms.bool(True),
+                          ComputeRegVars = cms.bool(False)
 #                          PileupJetIdParameters = cms.PSet(pu_jetid)
                         ))
 

@@ -15,6 +15,8 @@
 #include "flashgg/DataFormats/interface/TagTruthBase.h"
 #include "DataFormats/Common/interface/RefToPtr.h"
 #include "flashgg/DataFormats/interface/VBFTag.h"
+#include "flashgg/DataFormats/interface/NoTag.h"
+
 
 #include "TMVA/Reader.h"
 #include "TMath.h"
@@ -58,12 +60,19 @@ namespace flashgg {
         double massCutUpper;
         double massCutLower;
 
-        double minAcceptableObjectWeight;
-        double maxAcceptableObjectWeight;
+        double minObjectWeightException;
+        double maxObjectWeightException;
+        double minObjectWeightWarning;
+        double maxObjectWeightWarning;
+
 
         bool debug_;
         bool storeOtherTagInfo_;
         bool blindedSelectionPrintout_;
+
+        bool createNoTag_;
+        EDGetTokenT<int> stage0catToken_, stage1catToken_, njetsToken_;
+        EDGetTokenT<float> pTHToken_,pTVToken_;
 
         std::vector<std::tuple<DiPhotonTagBase::tag_t,int,int> > otherTags_; // (type,category,diphoton index)
 
@@ -76,12 +85,16 @@ namespace flashgg {
 
         massCutUpper = iConfig.getParameter<double>( "MassCutUpper" );
         massCutLower = iConfig.getParameter<double>( "MassCutLower" );
-        minAcceptableObjectWeight = iConfig.getParameter<double>( "MinAcceptableObjectWeight" );
-        maxAcceptableObjectWeight = iConfig.getParameter<double>( "MaxAcceptableObjectWeight" );
+        minObjectWeightException = iConfig.getParameter<double>( "MinObjectWeightException" );
+        maxObjectWeightException = iConfig.getParameter<double>( "MaxObjectWeightException" );
+        minObjectWeightWarning = iConfig.getParameter<double>( "MinObjectWeightWarning" );
+        maxObjectWeightWarning = iConfig.getParameter<double>( "MaxObjectWeightWarning" );
+
 
         debug_ = iConfig.getUntrackedParameter<bool>( "Debug", false );
         storeOtherTagInfo_ = iConfig.getParameter<bool>( "StoreOtherTagInfo" );
         blindedSelectionPrintout_ = iConfig.getParameter<bool>("BlindedSelectionPrintout");
+        createNoTag_ = iConfig.getParameter<bool>("CreateNoTag");
 
         const auto &vpset = iConfig.getParameterSetVector( "TagPriorityRanges" );
 
@@ -101,6 +114,13 @@ namespace flashgg {
             }
             TagPriorityRanges.emplace_back( tag.label(), c1, c2, i );
         }
+
+        ParameterSet HTXSps = iConfig.getParameterSet( "HTXSTags" );
+        stage0catToken_ = consumes<int>( HTXSps.getParameter<InputTag>("stage0cat") );
+        stage1catToken_ = consumes<int>( HTXSps.getParameter<InputTag>("stage1cat") );
+        njetsToken_ = consumes<int>( HTXSps.getParameter<InputTag>("njets") );
+        pTHToken_ = consumes<float>( HTXSps.getParameter<InputTag>("pTH") );
+        pTVToken_ = consumes<float>( HTXSps.getParameter<InputTag>("pTV") );
 
         produces<edm::OwnVector<flashgg::DiPhotonTagBase> >();
         produces<edm::OwnVector<flashgg::TagTruthBase> >();
@@ -185,11 +205,17 @@ namespace flashgg {
             if( chosen_i != -1 ) {
 
                 float centralObjectWeight = TagVectorEntry->ptrAt( chosen_i )->centralWeight();
-                if (centralObjectWeight < minAcceptableObjectWeight || centralObjectWeight > maxAcceptableObjectWeight) {
+                if (centralObjectWeight < minObjectWeightException || centralObjectWeight > maxObjectWeightException) {
                     throw cms::Exception( "TagObjectWeight" ) << " Tag centralWeight=" << centralObjectWeight << " outside of bound ["
-                                                              << minAcceptableObjectWeight << "," << maxAcceptableObjectWeight
+                                                              << minObjectWeightException << "," << maxObjectWeightException
                                                               << "] - " << tpr->name << " chosen_i=" << chosen_i << " - change bounds or debug tag";
                 }
+                if (centralObjectWeight < minObjectWeightWarning || centralObjectWeight > maxObjectWeightWarning) {
+                    std::cout << "WARNING Tag centralWeight=" << centralObjectWeight << " outside of bound ["
+                              << minObjectWeightException << "," << maxObjectWeightException
+                              << "] - " << tpr->name << " chosen_i=" << chosen_i << " - consider investigating!" << std::endl;
+                }
+
 
                 SelectedTag->push_back( *TagVectorEntry->ptrAt( chosen_i ) );
                 edm::Ptr<TagTruthBase> truth = TagVectorEntry->ptrAt( chosen_i )->tagTruth();
@@ -268,17 +294,56 @@ namespace flashgg {
                 } else {
                     std::cout << "* Other tag interpretations not stored (config)" << std::endl;
                 }
+                if( SelectedTagTruth->size() != 0 ) {
+                    std::cout << "* HTXS Category 0 (1): " << SelectedTagTruth->back().HTXSstage0cat() << " ("
+                              << SelectedTagTruth->back().HTXSstage1cat() << ")" << std::endl;
+                    std::cout << "* HTXS njets, pTH, pTV: " << SelectedTagTruth->back().HTXSnjets() << ", "
+                              << SelectedTagTruth->back().HTXSpTH() << ", "
+                              << SelectedTagTruth->back().HTXSpTV() << std::endl;
+                }
                 std::cout << "******************************" << std::endl;
             }
         }
 
         assert( SelectedTag->size() == 1 || SelectedTag->size() == 0 );
+        if (createNoTag_ && SelectedTag->size() == 0) {
+            SelectedTag->push_back(NoTag());
+            edm::RefProd<edm::OwnVector<TagTruthBase> > rTagTruth = evt.getRefBeforePut<edm::OwnVector<TagTruthBase> >();
+            TagTruthBase truth_obj;
+            Handle<int> stage0cat, stage1cat, njets;
+            Handle<float> pTH, pTV;
+            evt.getByToken(stage0catToken_, stage0cat);
+            evt.getByToken(stage1catToken_,stage1cat);
+            evt.getByToken(njetsToken_,njets);
+            evt.getByToken(pTHToken_,pTH);
+            evt.getByToken(pTVToken_,pTV);
+            if ( stage0cat.isValid() ) {
+                truth_obj.setHTXSInfo( *( stage0cat.product() ),
+                                       *( stage1cat.product() ),
+                                       *( njets.product() ),
+                                       *( pTH.product() ),
+                                       *( pTV.product() ) );
+            } else {
+                truth_obj.setHTXSInfo( 0, 0, 0, 0., 0. );
+            }
+            SelectedTagTruth->push_back(truth_obj);
+            SelectedTag->back().setTagTruth( edm::refToPtr( edm::Ref<edm::OwnVector<TagTruthBase> >( rTagTruth, 0 ) ) );
+            if( SelectedTagTruth->size() != 0 && debug_ ) {
+                std::cout << "******************************" << std::endl;
+                std::cout << " TRUTH FOR NO TAG..." << std::endl;
+                std::cout << "* HTXS Category 0 (1): " << SelectedTagTruth->back().HTXSstage0cat() << " ("
+                          << SelectedTagTruth->back().HTXSstage1cat() << ")" << std::endl;
+                std::cout << "* HTXS njets, pTH, pTV: " << SelectedTagTruth->back().HTXSnjets() << ", "
+                          << SelectedTagTruth->back().HTXSpTH() << ", "
+                          << SelectedTagTruth->back().HTXSpTV() << std::endl;
+                std::cout << "******************************" << std::endl;
+            }
+        }
         evt.put( SelectedTag );
         evt.put( SelectedTagTruth );
     }
 
     string TagSorter::tagName(DiPhotonTagBase::tag_t tagEnumVal) const {
-        //        enum tag_t { kUndefined = 0, kUntagged, kVBF, kTTHHadronic, kTTHLeptonic, kVHTight, kVHLoose, kVHHadronic, kVHEt };
         switch(tagEnumVal) {
         case DiPhotonTagBase::tag_t::kUndefined:
             return string("UNDEFINED");
@@ -298,6 +363,14 @@ namespace flashgg {
             return string("VHHadronic");
         case DiPhotonTagBase::tag_t::kVHEt:
             return string("VHEt");
+        case DiPhotonTagBase::tag_t::kZHLeptonic:
+            return string("ZHLeptonic");
+        case DiPhotonTagBase::tag_t::kWHLeptonic:
+            return string("WHLeptonic");
+        case DiPhotonTagBase::tag_t::kVHLeptonicLoose:
+            return string("VHLeptonicLoose");
+        case DiPhotonTagBase::tag_t::kVHMet:
+            return string("VHMet");
         }
         return string("TAG NOT ON LIST");
     }

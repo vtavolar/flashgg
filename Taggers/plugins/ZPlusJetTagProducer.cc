@@ -120,7 +120,7 @@ namespace flashgg {
 
             for( unsigned jetLoop = 0; jetLoop < Jets[candIndex]->size() ; jetLoop++ ) {
                 Ptr<flashgg::Jet> jet  = Jets[candIndex]->ptrAt( jetLoop );
-
+                //                if(!jet->passesJetID  ( flashgg::Loose ) ) { continue; }
                 if (jet->pt() < 20.) continue;
 
                 // close to lead photon?
@@ -145,6 +145,7 @@ namespace flashgg {
                     tag_obj.setSystLabel    ( systLabel_ );
                     tag_obj.setIsGold ( evt.run() );
                     tag_obj.includeWeights( *dipho );
+                    tag_obj.includeWeights( *leadingJet );
                     
                     //truth_obj.setGenPV( higgsVtx );
 

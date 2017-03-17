@@ -134,7 +134,7 @@ class JobsManager(object):
             
         self.uniqueNames = {}
 
-        self.checkCrossSections()
+        # self.checkCrossSections()
 
     # -------------------------------------------------------------------------------------------------------------------
     def __call__(self):
@@ -187,7 +187,7 @@ class JobsManager(object):
                 jobName,batchId = batchId
             else:
                 jobName=None
-            if ret != 0 and nsub <= self.options.maxResub:
+            if ( ret != 0 or not os.path.exists(outfile) ) and nsub <= self.options.maxResub:
                 if self.options.resubMissing:
                     out = self.parallel.run(cmd,args,jobName=jobName)
                     if self.options.queue and self.options.asyncLsf:
@@ -307,6 +307,8 @@ class JobsManager(object):
                 dsetName = dset.lstrip("/").replace("/","_")
                 dsetName = self.getUniqueName(dsetName)
                 outfile = "%s_%s.root" % ( outputPfx, dsetName )
+                if len(outfile) > 255:
+                    outfile = outfile.replace("RunIISpring16DR80X-2_3_0-25ns_","")
                 doutfiles[dsetName] = ( str(outfile),[] )
                 jobargs.extend( ["dataset=%s" % dset, "outputFile=%s" % outfile ] )
                 # add (and replace) per-dataset job arguments
@@ -585,7 +587,7 @@ class JobsManager(object):
 
         jobConfig = JobConfig(**kwargs)
 
-        sm = SamplesManager("$CMSSW_BASE/src/%s/MetaData/data/%s/datasets.json" % (jobConfig.metaDataSrc, campaign),
+        sm = SamplesManager("$CMSSW_BASE/src/%s/MetaData/data/%s/datasets*.json" % (jobConfig.metaDataSrc, campaign),
                             jobConfig.crossSections,
                             )
 

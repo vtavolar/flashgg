@@ -14,6 +14,7 @@ def printSystematicInfo(process):
     print 57*"-"
     vpsetlist2D  = [process.flashggDiPhotonSystematics.SystMethods2D, process.flashggMuonSystematics.SystMethods2D, process.flashggElectronSystematics.SystMethods2D]
     vpsetlist2D += [process.flashggJetSystematics0.SystMethods2D]
+    vpsetlist +=[process.flashggMetSystematics.SystMethods]
     printSystematicVPSet(vpsetlist2D)
 
 def printSystematicVPSet(vpsetlist):
@@ -56,7 +57,8 @@ def createStandardSystematicsProducers(process):
     process.load("flashgg.Systematics.flashggDiPhotonSystematics_cfi")
     process.load("flashgg.Systematics.flashggMuonSystematics_cfi")
     process.load("flashgg.Systematics.flashggElectronSystematics_cfi")
-
+    process.load("flashgg.Systematics.flashggMetSystematics_cfi")
+    
     from flashgg.Taggers.flashggTags_cff import UnpackedJetCollectionVInputTag
     from flashgg.Systematics.flashggJetSystematics_cfi import createJetSystematics
     jetSystematicsInputTags = createJetSystematics(process,UnpackedJetCollectionVInputTag)
@@ -69,6 +71,7 @@ def modifyTagSequenceForSystematics(process,jetSystematicsInputTags,ZPlusJetMode
     massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggUpdatedIdMVADiPhotons"),cms.InputTag("flashggDiPhotonSystematics"))
     massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggSelectedElectrons"),cms.InputTag("flashggElectronSystematics"))
     massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggSelectedMuons"),cms.InputTag("flashggMuonSystematics"))
+    massSearchReplaceAnyInputTag(process.flashggTagSequence,cms.InputTag("flashggMets"),cms.InputTag("flashggMetSystematics"))
     from flashgg.Taggers.flashggTags_cff import UnpackedJetCollectionVInputTag
     for i in range(len(jetSystematicsInputTags)):
         massSearchReplaceAnyInputTag(process.flashggTagSequence,UnpackedJetCollectionVInputTag[i],jetSystematicsInputTags[i])
@@ -81,12 +84,17 @@ def modifyTagSequenceForSystematics(process,jetSystematicsInputTags,ZPlusJetMode
         process.flashggSystTagMerger = cms.EDProducer("TagMerger",src=cms.VInputTag("flashggTagSorter"))
     process.systematicsTagSequences = cms.Sequence()
 
-def cloneTagSequenceForEachSystematic(process,systlabels,phosystlabels,jetsystlabels,jetSystematicsInputTags,ZPlusJetMode=False):
+def cloneTagSequenceForEachSystematic(process,systlabels=[],phosystlabels=[],metsystlabels=[],jetsystlabels=[],jetSystematicsInputTags=None,ZPlusJetMode=False):
+    #process,systlabels,phosystlabels,metsystlabels,jetsystlabels,jetSystematicsInputTags,ZPlusJetMode=False):
+    if jetSystematicsInputTags is None:
+        raise TypeError
     for systlabel in systlabels:
         if systlabel == "":
             continue
         from PhysicsTools.PatAlgos.tools.helpers import cloneProcessingSnippet,massSearchReplaceAnyInputTag
         newseq = cloneProcessingSnippet(process,process.flashggTagSequence,systlabel)
+        if systlabel in metsystlabels:
+            massSearchReplaceAnyInputTag(newseq,cms.InputTag("flashggMetSystematics"),cms.InputTag("flashggMetSystematics",systlabel))
         if systlabel in phosystlabels:
             massSearchReplaceAnyInputTag(newseq,cms.InputTag("flashggDiPhotonSystematics"),cms.InputTag("flashggDiPhotonSystematics",systlabel))
         if systlabel in jetsystlabels:
@@ -195,18 +203,24 @@ def customizeJetSystematicsForData(process):
         process.load("JetMETCorrections/Configuration/JetCorrectionServices_cff")
     process.jetCorrectorChain = cms.Sequence(process.ak4PFCHSL1FastL2L3ResidualCorrectorChain)
 
+    #hopefully a temporary hack
+    from os import environ
+    process.jec.connect = cms.string('sqlite_file:%s/src/flashgg/Systematics/data/JEC/Summer16_23Sep2016AllV4_DATA.db' % environ['CMSSW_BASE'])
+    process.jec.toGet[0].tag = cms.string('JetCorrectorParametersCollection_Summer16_23Sep2016AllV4_DATA_AK4PFchs')
+
+
 def useEGMTools(process):
     # remove old scales
     for isyst in [ process.MCScaleHighR9EB, process.MCScaleLowR9EB, process.MCScaleHighR9EE, process.MCScaleLowR9EE ]:
-        process.flashggDiPhotonSystematics.SystMethods.remove(isyst)
+            process.flashggDiPhotonSystematics.SystMethods.remove(isyst)
 
     # add EGM scales
     for isyst in [ process.MCScaleHighR9EB_EGM, process.MCScaleLowR9EB_EGM, process.MCScaleHighR9EE_EGM, process.MCScaleLowR9EE_EGM ]:
         process.flashggDiPhotonSystematics.SystMethods.insert(0, isyst)
 
     # remove old smearings
-    for isyst in [ process.MCSmearHighR9EE, process.MCSmearLowR9EE, process.MCSmearHighR9EB, process.MCSmearLowR9EB, process.SigmaEOverESmearing ]:
-        process.flashggDiPhotonSystematics.SystMethods.remove(isyst)
+    for isyst in [ process.MCSmearHighR9EE, process.MCSmearLowR9EE, process.MCSmearHighR9EB, process.MCSmearLowR9EB, process.SigmaEOverESmearing, process.SigmaEOverEShift ]:
+            process.flashggDiPhotonSystematics.SystMethods.remove(isyst)
 
     # add EGM smearings (2D)
     process.flashggDiPhotonSystematics.SystMethods2D.extend([
@@ -214,4 +228,8 @@ def useEGMTools(process):
             process.MCSmearLowR9EE_EGM,
             process.MCSmearHighR9EB_EGM,
             process.MCSmearLowR9EB_EGM,
-            process.SigmaEOverESmearing_EGM])
+            ])
+    
+    # add sigmaE/E correction and systematics
+    process.flashggDiPhotonSystematics.SystMethods.extend( [process.SigmaEOverESmearing_EGM, process.SigmaEOverEShift] )
+    

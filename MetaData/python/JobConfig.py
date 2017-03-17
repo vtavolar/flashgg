@@ -57,11 +57,6 @@ class JobConfig(object):
                        VarParsing.VarParsing.multiplicity.singleton, # singleton or list
                        VarParsing.VarParsing.varType.bool,          # string, int, or float
                        "useEOS")
-        self.options.register ('atIC',
-                       False,
-                       VarParsing.VarParsing.multiplicity.singleton, # singleton or list
-                       VarParsing.VarParsing.varType.bool,          # string, int, or float 
-                       "atIC")
         self.options.register ('targetLumi',
                        1.e+3, # default value
                        VarParsing.VarParsing.multiplicity.singleton, # singleton or list
@@ -128,10 +123,16 @@ class JobConfig(object):
             
         try:
             from SimGeneral.MixingModule.mix_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU_cfi import mix as mix_2016_80_25ns
-            self.pu_distribs["80X_mcRun2_asymptotic_2016"] = mix_2016_80_25ns.input.nbPileupEvents
             self.pu_distribs["PUSpring16"] = mix_2016_80_25ns.input.nbPileupEvents
         except Exception:
             print "Failed to load 80X mixing, this is expected in 7X!"
+
+        try:
+            from SimGeneral.MixingModule.mix_2016_25ns_Moriond17MC_PoissonOOTPU_cfi import mix as mix_Moriond17
+            self.pu_distribs["Summer16"] = mix_Moriond17.input.nbPileupEvents
+            self.pu_distribs["PUMoriond17"] = mix_Moriond17.input.nbPileupEvents
+        except Exception:
+            print "Failed to load Moriond17 mixing, this is expected in earlier releases"
             
     def __getattr__(self,name):
         ## did not manage to inherit from VarParsing, because of some issues in __init__
@@ -151,6 +152,7 @@ class JobConfig(object):
         isFwlite = False
         hasOutput = False
         hasTFile = False
+        sp_unused = ""
         if hasattr(process,"fwliteInput"):
             isFwlite = True
         if not isFwlite:
@@ -165,7 +167,7 @@ class JobConfig(object):
         if self.dryRun:
             import sys
             if self.dataset and self.dataset != "":
-                name,xsec,totEvents,files,maxEvents = self.dataset
+                name,xsec,totEvents,files,maxEvents,sp_unused = self.dataset
                 if self.getMaxJobs:
                     print "maxJobs:%d" % ( min(len(files),self.nJobs) )                    
                 if len(files) != 0:
@@ -183,7 +185,7 @@ class JobConfig(object):
 
         files = self.inputFiles
         if self.dataset and self.dataset != "":
-            dsetname,xsec,totEvents,files,maxEvents = self.dataset
+            dsetname,xsec,totEvents,files,maxEvents,sp_unused = self.dataset
             if type(xsec) == float:
                 print 
                 print "Error: cross section not found for dataset %s" % dsetname
@@ -363,16 +365,13 @@ class JobConfig(object):
         if self.useAAA:
             self.filePrepend = "root://xrootd-cms.infn.it/"
         elif self.useEOS:
-            if self.atIC:
-                self.filePrepend = "root://eoscms.cern.ch//eos/cms"
-            else:    
-                self.filePrepend = "root://eoscms//eos/cms"
+            self.filePrepend = "root://eoscms.cern.ch//eos/cms"
         
         self.samplesMan = None
         dataset = None
         if self.dataset != "":
             print "Reading dataset (%s) %s" % ( self.campaign, self.dataset)
-            self.samplesMan = SamplesManager("$CMSSW_BASE/src/%s/MetaData/data/%s/datasets.json" % (self.metaDataSrc, self.campaign),
+            self.samplesMan = SamplesManager("$CMSSW_BASE/src/%s/MetaData/data/%s/datasets*.json" % (self.metaDataSrc, self.campaign),
                                          self.crossSections,
                                          )
             if self.dryRun and self.getMaxJobs:
@@ -386,7 +385,9 @@ class JobConfig(object):
         self.dataset = dataset
         # auto-detect data from xsec = 0
         if self.dataset:
-            name,xsec,totEvents,files,maxEvents = self.dataset            
+            name,xsec,totEvents,files,maxEvents,specialPrepend = self.dataset
+            if len(specialPrepend) > 0 and not self.useAAA:
+                self.filePrepend = specialPrepend
             if type(xsec) != dict or type(xsec.get("xs",None)) != float:
                 print "Warning: you are running on a dataset for which you specified no cross section: \n %s " % name
             else:

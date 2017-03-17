@@ -7,6 +7,7 @@
 #include "FWCore/Common/interface/TriggerNames.h"
 
 #include "TTree.h"
+//#include <limits>
 
 using namespace edm;
 using namespace reco;
@@ -29,6 +30,7 @@ namespace flashgg {
             const auto extraFloats = cfg.getParameter<ParameterSet>( "extraFloats" );
             extraFloatNames_ = extraFloats.getParameterNamesForType<InputTag>();
             for( auto & name : extraFloatNames_ ) {
+                //std::cout<<"GVD.cc name: "<<name<<std::endl;
                 extraFloatTags_.push_back( extraFloats.getParameter<InputTag>(name) );
             }
         }
@@ -45,10 +47,36 @@ namespace flashgg {
         }
         if( cfg.exists( "extraFloats" ) ){
             const auto extraFloats = cfg.getParameter<ParameterSet>( "extraFloats" );
-            extraFloatNames_ = extraFloats.getParameterNamesForType<InputTag>();
-            for( auto & name : extraFloatNames_ ) {
-                extraFloatTokens_.push_back( cc.consumes<float>(extraFloats.getParameter<InputTag>(name)) );
-                extraVectorFloatTokens_.push_back( cc.consumes<std::vector<float>>(extraFloats.getParameter<InputTag>(name)) );
+            const auto extraFloatPSetNames_ = extraFloats.getParameterNamesForType<ParameterSet>();
+            for(auto& extrafloatPSetName : extraFloatPSetNames_){
+            //            for(int ipset=0; ipset< extraFloatPSets_.size(); ipset++){
+            //  edm::ParameterSet extrafloatPSet=extraFloatPSets_[ipset];
+                edm::ParameterSet extrafloatPSet= extraFloats.getParameter<ParameterSet>(extrafloatPSetName);
+                //std::cout<<"extrafloatPSetName "<<extrafloatPSetName<<std::endl;
+                extraFloatNames_.push_back( extrafloatPSetName );;
+                const auto nbins  = extrafloatPSet.existsAs<int >("nbins") ? extrafloatPSet.getParameter<int >("nbins") : 0;
+                const auto vmin   = extrafloatPSet.existsAs<double >("vmin") ? extrafloatPSet.getParameter<double >("vmin") : std::numeric_limits<double>::lowest();
+                const auto vmax   = extrafloatPSet.existsAs<double >("vmax") ? extrafloatPSet.getParameter<double >("vmax") : std::numeric_limits<double>::max();
+                //                const auto vmin   = extrafloatPSet.existsAs<double >("vmin") ? extrafloatPSet.getParameter<double >("vmin") : -999999.;
+                //                const auto vmax   = extrafloatPSet.existsAs<double >("vmax") ? extrafloatPSet.getParameter<double >("vmax") : 999999.;
+                const auto binning =  extrafloatPSet.existsAs<std::vector<double > >("binning") ? extrafloatPSet.getParameter<std::vector<double> >("binning") : std::vector<double >();
+
+                //std::cout<<"nbins "<<nbins<<std::endl;
+                //std::cout<<"vmin "<<vmin<<std::endl;
+                //std::cout<<"vmax "<<vmax<<std::endl;
+                //std::cout<<"binning size "<<binning.size()<<std::endl;
+
+                extraFloatNBins_.insert( std::pair<std::string,int>(extrafloatPSetName, nbins) );
+                extraFloatVmins_.insert( std::pair<std::string,double>(extrafloatPSetName, vmin ) );
+                extraFloatVmaxs_.insert( std::pair<std::string,double>(extrafloatPSetName, vmax ) );
+                extraFloatBinnings_.insert( std::pair<std::string, std::vector<double > >(extrafloatPSetName, binning ) );
+            //////          }
+            //            extraFloatNames_ = extraFloats.getParameterNamesForType<InputTag>();
+            //////            for( auto & name : extraFloatNames_ ) {
+                //std::cout<<"GVD.cc name: "<<extrafloatPSetName<<std::endl;
+                extraFloatTokens_.push_back( cc.consumes<float>(extrafloatPSet.getParameter<InputTag>("src")) );
+                extraDoubleTokens_.push_back( cc.consumes<double>(extrafloatPSet.getParameter<InputTag>("src")) );
+                extraVectorFloatTokens_.push_back( cc.consumes<std::vector<float>>(extrafloatPSet.getParameter<InputTag>("src")) );
             }
         }
         _init(cfg);
@@ -70,8 +98,8 @@ namespace flashgg {
         processIndex_ = -999;
 
         if( cfg.exists( "extraFloats" ) ){
-            const auto extraFloats = cfg.getParameter<ParameterSet>( "extraFloats" );
-            extraFloatNames_ = extraFloats.getParameterNamesForType<InputTag>();
+            //            const auto extraFloats = cfg.getParameter<ParameterSet>( "extraFloats" );
+            //            extraFloatNames_ = extraFloats.getParameterNamesForType<InputTag>();
             extraFloatVariables_.resize(extraFloatNames_.size(),0.);
         }
     }
@@ -101,10 +129,65 @@ namespace flashgg {
             tree->Branch( bit.first.c_str(), &bit.second, ( bit.first + "/O" ).c_str() );
         }
         if( dumpLumiFactor_ ) { tree->Branch( "lumiFactor", &lumiFactor_ ); }
-        for( size_t iextra = 0; iextra<extraFloatNames_.size(); ++iextra ) {
-            tree->Branch( extraFloatNames_[iextra].c_str(), &extraFloatVariables_[iextra] );
+        //        for( size_t iextra = 0; iextra<extraFloatNames_.size(); ++iextra ) {
+        //            tree->Branch( extraFloatNames_[iextra].c_str(), &extraFloatVariables_[iextra] );
+        //        }
+    }
+
+
+    std::vector<std::string> GlobalVariablesDumper::getExtraFloatNames(){
+        return extraFloatNames_;
+    }
+    
+    int GlobalVariablesDumper::getExtraFloatNBin(std::string extrafloatname){
+        if (extraFloatNBins_.find(extrafloatname) != extraFloatNBins_.end()){
+            return extraFloatNBins_[extrafloatname];
+        }
+        else{
+            return 0;
         }
     }
+    
+    double GlobalVariablesDumper::getExtraFloatVmin(std::string extrafloatname){
+        if (extraFloatVmins_.find(extrafloatname) != extraFloatVmins_.end()){
+            return extraFloatVmins_[extrafloatname];
+        }
+        else{
+            //            return std::numeric_limits<double>::lowest();
+            return -99.;
+        }
+    }
+
+    double GlobalVariablesDumper::getExtraFloatVmax(std::string extrafloatname){
+        if (extraFloatVmaxs_.find(extrafloatname) != extraFloatVmaxs_.end()){
+            return extraFloatVmaxs_[extrafloatname];
+        }
+        else{
+            //            return std::numeric_limits<double>::max();
+            return 99.;
+        }
+    }
+    
+    float GlobalVariablesDumper::getExtraFloat(std::string varname){
+        for( size_t iextra = 0; iextra<extraFloatNames_.size(); ++iextra ) {
+            if(extraFloatNames_[iextra] == varname){
+                return extraFloatVariables_[iextra];
+            } 
+        }
+        return -9999.;
+
+    }
+    
+    std::vector<double > GlobalVariablesDumper::getExtraFloatBinning(std::string extrafloatname){
+        if (extraFloatBinnings_.find(extrafloatname) != extraFloatBinnings_.end()){
+            return extraFloatBinnings_[extrafloatname];
+        }
+        else{
+            return std::vector<double >();
+        }
+        
+    }
+
 
     void GlobalVariablesDumper::fill( const EventBase &evt )
     {
@@ -142,16 +225,34 @@ namespace flashgg {
                 }
                 extraFloatVariables_[iextra] = *ihandle;
             } catch (...) {
-                Handle<std::vector<float> > ihandle; 
-                if( fullEvent ) { 
-                    fullEvent->getByToken( extraVectorFloatTokens_[iextra], ihandle );
-                } else {
-                    evt.getByLabel( extraFloatTags_[iextra], ihandle );
-                }
-                // assert( ihandle->size() == 1 );
-                if( ihandle->size()  < 1 ) { std::cout << "NO extra float......... " << extraFloatTags_[iextra].label() << std::endl; continue; }
-                extraFloatVariables_[iextra] = (*ihandle)[0];
+                try{
+                    Handle<double> ihandle; 
+                    if( fullEvent ) { 
+                        fullEvent->getByToken( extraDoubleTokens_[iextra], ihandle );
+                    } else {
+                        evt.getByLabel( extraFloatTags_[iextra], ihandle );
+                    }
+                    extraFloatVariables_[iextra] = *ihandle;
+                } catch (...) {
+                    Handle<std::vector<float> > ihandle; 
+                    if( fullEvent ) { 
+                        fullEvent->getByToken( extraVectorFloatTokens_[iextra], ihandle );
+                    } else {
+                        evt.getByLabel( extraFloatTags_[iextra], ihandle );
+                    }
+                    // assert( ihandle->size() == 1 );
+                    if(! ihandle.isValid()){
+                        std::cout<<"missing extra float "<< extraFloatNames_[iextra] <<std::endl;
+                        assert(0);
+                    }
 
+                    //std::cout<<ihandle.product()<<std::endl;
+                    // std::cout<< extraFloatNames_[iextra] <<std::endl;
+                    if( ihandle->size()  < 1 ) {
+                        //std::cout << "NO extra float......... " << extraFloatNames_[iextra] << std::endl;
+                        continue; }
+                    extraFloatVariables_[iextra] = (*ihandle)[0];
+                }
             }
         }
     }
