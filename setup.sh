@@ -113,6 +113,9 @@ git cms-merge-topic cms-met:METRecipe_8020 -u
 echo "grabbing JetMCUtils..."
 git cms-addpkg PhysicsTools/JetMCUtils
 
+echo "grabbing JetMCUtils..."
+git cms-addpkg PhysicsTools/JetMCUtils
+
 # Straightofrward update for 8_0_28
 echo "Setting up QGL..."
 git cms-addpkg RecoJets/JetProducers
