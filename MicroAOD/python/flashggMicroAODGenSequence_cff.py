@@ -5,7 +5,8 @@ from flashgg.MicroAOD.flashggGenPhotonsExtra_cfi import flashggGenPhotonsExtra
 
 from flashgg.MicroAOD.flashggGenLeptons_cfi import flashggGenLeptons
 from flashgg.MicroAOD.flashggGenLeptonsExtra_cfi import flashggGenLeptonsExtra
+from flashgg.MicroAOD.flashggGenJetsExtra_cfi import flashggGenJetsExtra
 
 
-flashggMicroAODGenSequence = cms.Sequence(flashggPrunedGenParticles+flashggGenPhotons*flashggGenPhotonsExtra + flashggGenLeptons*flashggGenLeptonsExtra
+flashggMicroAODGenSequence = cms.Sequence(flashggPrunedGenParticles+flashggGenPhotons*flashggGenPhotonsExtra + flashggGenLeptons*flashggGenLeptonsExtra + flashggGenJetsExtra
                                         )
