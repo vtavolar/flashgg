@@ -110,6 +110,10 @@ git cms-merge-topic ikrav:egm_id_80X_v3_photons
 echo "grabbing MET topic updates..."
 git cms-merge-topic cms-met:METRecipe_8020 -u
 
+echo "grabbing JetMCUtils..."
+git cms-addpkg PhysicsTools/JetMCUtils
+
+# Straightofrward update for 8_0_28
 echo "Setting up QGL..."
 git cms-addpkg RecoJets/JetProducers
 git cms-merge-topic -u sethzenz:for-flashgg-QGL-vertexIndex-8_0_26
