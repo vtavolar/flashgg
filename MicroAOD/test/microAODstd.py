@@ -11,7 +11,7 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 1000) )
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32( 1000 )
 
 import os
@@ -20,7 +20,10 @@ if os.environ["CMSSW_VERSION"].count("CMSSW_8_0"):
 #    process.source = cms.Source("PoolSource",fileNames=cms.untracked.vstring("/store/mc/RunIISummer16MiniAODv2/GluGluHToGG_M-125_13TeV_powheg_pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/60000/024E4FA3-8BBC-E611-8E3D-00266CFFBE88.root"))
 #    process.source = cms.Source("PoolSource",fileNames=cms.untracked.vstring("/store/mc/RunIISummer16MiniAODv2/VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/60000/2C01ADB4-07D6-E611-9FA2-0CC47AD98C5E.root"))
     #HH->bbgg
+    #file1
     process.source = cms.Source("PoolSource",fileNames=cms.untracked.vstring("/store/mc/RunIISummer16MiniAODv2/GluGluToHHTo2B2G_node_SM_13TeV-madgraph/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/96A0C67D-1EBF-E611-A283-C4346BC08440.root"))
+    #file2
+##    process.source = cms.Source("PoolSource",fileNames=cms.untracked.vstring(" /store/mc/RunIISummer16MiniAODv2/GluGluToHHTo2B2G_node_SM_13TeV-madgraph/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/9A92857D-1EBF-E611-ABC9-008CFAFBDC0E.root"))
 elif os.environ["CMSSW_VERSION"].count("CMSSW_9_2"):
     process.GlobalTag = GlobalTag(process.GlobalTag,'92X_dataRun2_Prompt_v4','')
     process.source = cms.Source("PoolSource",fileNames=cms.untracked.vstring("/store/data/Run2017A/DoubleEG/MINIAOD/PromptReco-v2/000/296/173/00000/C24ABCFB-644C-E711-8A5E-02163E01A21C.root"))

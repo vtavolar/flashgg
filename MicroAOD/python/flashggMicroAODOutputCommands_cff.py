@@ -42,7 +42,7 @@ microAODDefaultOutputCommand = cms.untracked.vstring("drop *",
                                                      "keep *_selectedPatTrigger_*_*",
                                                      "keep *_particleFlowEGammaGSFixed_dupECALClusters_*",
                                                      "keep *_ecalMultiAndGSGlobalRecHitEB_hitsNotReplaced_*",
-                                                     "keep *_flashggGenJetsExtra_*_*"
+                                                     "keep *_flashggGenJetsExtra_*_*",
 
                                                      )
 
